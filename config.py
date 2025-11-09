@@ -16,7 +16,7 @@ LOG_LEVEL = "INFO"
 # Knowledge Base Settings
 MAX_RULES = 100  # Maximum number of rules (for Phase 1)
 CONFIDENCE_THRESHOLD = 0.5  # Minimum confidence for valid response
-DEFAULT_LANGUAGE = "en"  # English (Phase 3 will add 'si', 'ta')
+DEFAULT_LANGUAGE = "en"  # English only
 
 # UI Settings
 PAGE_TITLE = "EduMentor - O/L Science Tutor"
@@ -82,19 +82,6 @@ LLM_MODEL = "gemini-2.5-flash"  # Available models: gemini-2.5-flash, gemini-2.5
 LLM_TEMPERATURE = 0.7
 LLM_MAX_TOKENS = 500
 FALLBACK_TO_EXPERT_SYSTEM = True  # If LLM fails, use expert system
-
-# Multilingual Support
-MULTILINGUAL_ENABLED = True
-SUPPORTED_LANGUAGES = ["en", "si", "ta"]
-AUTO_DETECT_LANGUAGE = True
-DEFAULT_LANGUAGE = "en"
-
-# Language Display Names
-LANGUAGE_NAMES = {
-    "en": "English",
-    "si": "සිංහල (Sinhala)",
-    "ta": "தமிழ் (Tamil)"
-}
 
 # Analytics (Future)
 TRACK_USAGE = False

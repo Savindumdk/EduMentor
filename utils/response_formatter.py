@@ -25,6 +25,7 @@ class ResponseFormatter:
         original_explanation = response_data.get('explanation', '')
         enhanced_explanation = response_data.get('enhanced_explanation', '')
         llm_enhanced = response_data.get('llm_enhanced', False)
+        needs_clarification = response_data.get('needs_clarification', False)
         
         # If LLM enhanced, show both original KB rule and LLM enhancement
         if llm_enhanced and enhanced_explanation and original_explanation:
@@ -43,7 +44,8 @@ class ResponseFormatter:
             'examples': response_data.get('examples', []),
             'agent_used': response_data.get('agent', 'Unknown'),
             'llm_enhanced': llm_enhanced,
-            'language': response_data.get('language', 'en')
+            'language': response_data.get('language', 'en'),
+            'needs_clarification': needs_clarification
         }
         
         return formatted
@@ -116,15 +118,31 @@ class ResponseFormatter:
         Returns:
             dict: Display-optimized dictionary
         """
-        display = {
-            'status': '✓ Success' if formatted_response['success'] else '✗ Failed',
-            'topic': f"📚 {formatted_response['topic']}",
-            'concept': f"💡 {formatted_response['concept']}",
-            'explanation': formatted_response['explanation'],
-            'agent': f"🤖 {formatted_response['agent_used']}",
-            'enhancement': '🌟 LLM Enhanced' if formatted_response['llm_enhanced'] else '📖 Expert System',
-            'language': formatted_response['language'].upper()
-        }
+        # Check if this is a clarification request
+        needs_clarification = formatted_response.get('needs_clarification', False)
+        
+        if needs_clarification:
+            display = {
+                'status': '❓ Needs Clarification',
+                'topic': f"📚 {formatted_response['topic']}",
+                'concept': '💡 Clarification Needed',
+                'explanation': formatted_response['explanation'],
+                'agent': f"🤖 {formatted_response['agent_used']}",
+                'enhancement': '❓ Awaiting Clarification',
+                'language': formatted_response['language'].upper(),
+                'needs_clarification': True
+            }
+        else:
+            display = {
+                'status': '✓ Success' if formatted_response['success'] else '✗ Failed',
+                'topic': f"📚 {formatted_response['topic']}",
+                'concept': f"💡 {formatted_response['concept']}",
+                'explanation': formatted_response['explanation'],
+                'agent': f"🤖 {formatted_response['agent_used']}",
+                'enhancement': '🌟 LLM Enhanced' if formatted_response['llm_enhanced'] else '📖 Expert System',
+                'language': formatted_response['language'].upper(),
+                'needs_clarification': False
+            }
         
         if formatted_response.get('examples'):
             display['examples'] = ResponseFormatter.format_examples(

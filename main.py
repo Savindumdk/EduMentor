@@ -1,40 +1,24 @@
 """
 EduMentor - O/L Multi-Subject Tutor Expert System
 --------------------------------------------------
-Phase 2+3: Multi-Agent System + LLM Integration
-Streamlit-based user interface with natural language enhancement.
+NEW ARCHITECTURE: Intent Classifier + Traditional @Rule Expert Systems + Response Refinement
 """
 
 import streamlit as st
-import os
-from datetime import datetime
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
-# Import MAS components
-from agents.coordinator_agent import CoordinatorAgent
-
-# Import LLM components
-from llm.gemini_interface import GeminiInterface, HybridSystem
-
-# Import utilities
-from utils.language_detector import detect_language
-from utils.response_formatter import create_display
-
-# Import configuration
-import config
-
+from core.orchestrator import SystemOrchestrator
 
 # Page configuration
 st.set_page_config(
-    page_title=config.PAGE_TITLE,
-    page_icon=config.PAGE_ICON,
+    page_title="EduMentor - AI Tutor",
+    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
 
 # Custom CSS
 st.markdown("""
@@ -44,6 +28,7 @@ st.markdown("""
         color: #1E88E5;
         text-align: center;
         margin-bottom: 1rem;
+        font-weight: bold;
     }
     .sub-header {
         font-size: 1.2rem;
@@ -51,324 +36,261 @@ st.markdown("""
         text-align: center;
         margin-bottom: 2rem;
     }
-    .agent-badge {
-        display: inline-block;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: bold;
-        margin: 0.3rem;
-        font-size: 0.9rem;
-    }
-    .response-box {
-        background-color: #f0f2f6;
-        padding: 1.5rem;
-        border-radius: 10px;
-        border-left: 5px solid #1E88E5;
+    .expert-rule-box {
+        background-color: #f0f8ff;
+        padding: 1rem;
+        border-left: 4px solid #1E88E5;
+        border-radius: 4px;
         margin: 1rem 0;
     }
-    .enhanced-badge {
-        background-color: #FFD700;
-        color: #333;
-        padding: 0.2rem 0.6rem;
-        border-radius: 10px;
-        font-size: 0.8rem;
-        font-weight: bold;
+    .refined-response-box {
+        background-color: #fff8e1;
+        padding: 1rem;
+        border-left: 4px solid #FFA726;
+        border-radius: 4px;
+        margin: 1rem 0;
     }
-    .expert-badge {
-        background-color: #4CAF50;
+    .clarification-box {
+        background-color: #fff3e0;
+        padding: 1rem;
+        border-left: 4px solid #FF9800;
+        border-radius: 4px;
+        margin: 1rem 0;
+    }
+    .diagnosis-box {
+        background-color: #e8f5e9;
+        padding: 1.5rem;
+        border-left: 4px solid #4CAF50;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+    .stButton>button {
+        width: 100%;
+        background-color: #1E88E5;
         color: white;
-        padding: 0.2rem 0.6rem;
-        border-radius: 10px;
-        font-size: 0.8rem;
         font-weight: bold;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
-def initialize_session_state():
-    """Initialize session state variables."""
-    if 'conversation_history' not in st.session_state:
-        st.session_state.conversation_history = []
-    
-    if 'question_count' not in st.session_state:
-        st.session_state.question_count = 0
-    
-    if 'coordinator' not in st.session_state:
-        # Initialize MAS Coordinator
-        st.session_state.coordinator = CoordinatorAgent()
-    
-    if 'llm_interface' not in st.session_state:
-        # Initialize LLM Interface
-        api_key = os.getenv('GEMINI_API_KEY')
-        st.session_state.llm_interface = GeminiInterface(api_key)
-    
-    if 'hybrid_system' not in st.session_state:
-        # Initialize Hybrid System (MAS + LLM)
-        st.session_state.hybrid_system = HybridSystem(
-            st.session_state.coordinator,
-            st.session_state.llm_interface
-        )
+@st.cache_resource
+def initialize_system():
+    """Initialize the orchestrator (cached for performance)."""
+    return SystemOrchestrator()
 
 
-def display_header():
-    """Display main header."""
-    st.markdown('<div class="main-header">🎓 EduMentor</div>', unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="sub-header">AI-Powered Multi-Subject O/L Tutor - {config.PHASE}</div>',
-        unsafe_allow_html=True
-    )
-    
-    st.markdown(f"""
-    Welcome to **EduMentor v{config.SYSTEM_VERSION}**! 
-    
-    I'm powered by:
-    - 🤖 **Multi-Agent System** with 6 specialized agents
-    - 🌟 **Gemini AI** for natural language explanations
-    - 🌍 **Multilingual Support** (English, Sinhala, Tamil)
-    
-    Ask me anything about **Physics, Biology, Chemistry, Mathematics, History**, or **Study Tips**!
-    """)
+def get_orchestrator():
+    """Get or create orchestrator for this session."""
+    if 'orchestrator' not in st.session_state:
+        st.session_state.orchestrator = SystemOrchestrator()
+    return st.session_state.orchestrator
 
 
-def display_sidebar():
-    """Display sidebar with settings and info."""
-    with st.sidebar:
-        st.header("⚙️ Settings")
+def display_response(result: dict):
+    """Display the system's response based on type."""
+    
+    response_type = result.get('response_type', 'answer')
+    
+    if response_type == 'clarification_request':
+        st.markdown('<div class="clarification-box">', unsafe_allow_html=True)
+        st.markdown("### 🤔 Clarification Needed")
+        st.markdown(result['content'])
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    elif response_type == 'diagnosis':
+        # Diagnostic expert response (Study Guide)
+        st.markdown('<div class="diagnosis-box">', unsafe_allow_html=True)
         
-        # Language selection
-        st.subheader("🌍 Language")
-        language = st.selectbox(
-            "Response Language",
-            options=list(config.SUPPORTED_LANGUAGES),
-            format_func=lambda x: config.LANGUAGE_NAMES.get(x, x),
-            index=0
-        )
+        # Diagnosis header
+        diagnosis_data = result.get('expert_rule', result)
+        concept = diagnosis_data.get('concept', 'Diagnosis')
+        confidence = diagnosis_data.get('confidence', 'High')
         
-        # LLM toggle
-        st.subheader("🌟 Enhancement")
-        use_llm = st.checkbox(
-            "Use AI Enhancement",
-            value=config.LLM_ENABLED and st.session_state.llm_interface.is_enabled(),
-            help="Enhance responses with Gemini AI for natural language"
-        )
-        
-        # Subject filter
-        st.subheader("📚 Subjects")
-        st.markdown("**Available Agents:**")
-        for subject, info in config.SUBJECTS.items():
-            if info['enabled']:
-                st.markdown(f"{info['icon']} {subject}")
-        
-        st.divider()
-        
-        # System info
-        st.subheader("ℹ️ System Info")
-        system_info = st.session_state.hybrid_system.get_system_info()
-        st.write(f"**Agents:** {system_info['agents_available']}")
-        st.write(f"**MAS:** {'✓ Enabled' if system_info['mas_enabled'] else '✗ Disabled'}")
-        st.write(f"**LLM:** {'✓ Enabled' if system_info['llm_enabled'] else '✗ Disabled'}")
-        
-        # Statistics
-        if config.ENABLE_AGENT_STATISTICS:
-            st.divider()
-            st.subheader("📊 Agent Statistics")
-            stats = st.session_state.coordinator.get_agent_statistics()
-            for agent_name, count in stats.items():
-                st.write(f"**{agent_name}:** {count} questions")
-        
-        # Clear history
-        st.divider()
-        if st.button("🗑️ Clear History"):
-            st.session_state.conversation_history = []
-            st.session_state.question_count = 0
-            st.rerun()
-        
-        return language, use_llm
-
-
-def display_question_input():
-    """Display question input area."""
-    st.subheader("💬 Ask Your Question")
-    
-    col1, col2 = st.columns([4, 1])
-    
-    with col1:
-        question = st.text_area(
-            "Type your question here:",
-            placeholder="Example: What is photosynthesis?",
-            height=100,
-            label_visibility="collapsed"
-        )
-    
-    with col2:
-        st.write("")  # Spacing
-        st.write("")  # Spacing
-        submit = st.button("🚀 Ask", type="primary", use_container_width=True)
-    
-    return question, submit
-
-
-def process_and_display_response(question, language, use_llm):
-    """Process question and display response."""
-    
-    if not question or question.strip() == "":
-        st.warning("⚠️ Please enter a question!")
-        return
-    
-    # Show processing
-    with st.spinner("🤔 Thinking..."):
-        # Auto-detect language if enabled
-        if config.AUTO_DETECT_LANGUAGE:
-            detected_lang = detect_language(question)
-            st.info(f"🌍 Detected language: {config.LANGUAGE_NAMES.get(detected_lang, detected_lang)}")
-            if detected_lang != 'en' and language == 'en':
-                language = detected_lang
-        
-        # Process through hybrid system
-        try:
-            response = st.session_state.hybrid_system.process_question(
-                question,
-                language=language,
-                use_llm=use_llm
-            )
-            
-            # Format response for display
-            display_data = create_display(response)
-            
-            # Store in history
-            st.session_state.conversation_history.append({
-                'timestamp': datetime.now(),
-                'question': question,
-                'response': display_data,
-                'language': language
-            })
-            st.session_state.question_count += 1
-            
-            # Display response
-            display_response(display_data)
-            
-        except Exception as e:
-            st.error(f"❌ Error processing question: {str(e)}")
-            if config.DEBUG_MODE:
-                st.exception(e)
-
-
-def display_response(display_data):
-    """Display formatted response."""
-    
-    st.markdown('<div class="response-box">', unsafe_allow_html=True)
-    
-    # Status and metadata
-    col1, col2, col3 = st.columns([2, 2, 2])
-    with col1:
-        st.markdown(f"**Status:** {display_data['status']}")
-    with col2:
-        st.markdown(f"**Agent:** {display_data['agent']}")
-    with col3:
-        if display_data.get('enhancement') == '🌟 LLM Enhanced':
-            st.markdown('<span class="enhanced-badge">🌟 AI Enhanced</span>', unsafe_allow_html=True)
+        # Display confidence badge
+        if 'Medium' in confidence or 'Low' in confidence:
+            st.warning(f"**{concept}** (Confidence: {confidence})")
         else:
-            st.markdown('<span class="expert-badge">📖 Expert System</span>', unsafe_allow_html=True)
-    
-    st.divider()
-    
-    # Topic and concept
-    st.markdown(f"### {display_data['topic']}")
-    st.markdown(f"**Concept:** {display_data['concept']}")
-    
-    st.divider()
-    
-    # Main explanation
-    st.markdown("### 📝 Explanation")
-    st.markdown(display_data['explanation'])
-    
-    # Examples if available
-    if 'examples' in display_data:
-        st.divider()
-        st.markdown("### 📚 Examples")
-        st.markdown(display_data['examples'])
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-def display_conversation_history():
-    """Display conversation history."""
-    if st.session_state.conversation_history:
-        st.divider()
-        st.subheader("📜 Conversation History")
+            st.success(f"**{concept}**")
         
-        for i, entry in enumerate(reversed(st.session_state.conversation_history[-5:])):
-            with st.expander(f"Q{st.session_state.question_count - i}: {entry['question'][:50]}..."):
-                st.write(f"**Time:** {entry['timestamp'].strftime('%H:%M:%S')}")
-                st.write(f"**Language:** {entry['language'].upper()}")
-                st.write(f"**Topic:** {entry['response']['topic']}")
-                st.write(f"**Agent:** {entry['response']['agent']}")
-                st.markdown("**Answer:**")
-                st.markdown(entry['response']['explanation'][:200] + "...")
-
-
-def display_quick_examples():
-    """Display quick example questions."""
-    st.divider()
-    st.subheader("💡 Quick Examples")
+        # Main diagnosis
+        if diagnosis_data.get('diagnosis'):
+            st.markdown("### 📋 Problem Identified")
+            st.markdown(diagnosis_data['diagnosis'])
+        
+        # Explanation
+        if diagnosis_data.get('explanation'):
+            st.markdown("### 📖 Why This Happens")
+            st.markdown(diagnosis_data['explanation'])
+        
+        # Recommendations (most important!)
+        if diagnosis_data.get('recommendation'):
+            with st.expander("💡 **Personalized Action Plan** (Click to expand)", expanded=True):
+                st.markdown(diagnosis_data['recommendation'])
+        
+        # Reasoning chain (explainability)
+        if diagnosis_data.get('reasoning_chain'):
+            with st.expander("🔍 How I Reached This Conclusion", expanded=False):
+                st.markdown("**Reasoning Steps:**")
+                for i, step in enumerate(diagnosis_data['reasoning_chain'], 1):
+                    st.markdown(f"{i}. {step}")
+        
+        # Examples
+        if diagnosis_data.get('examples'):
+            with st.expander("📝 Practice Suggestions", expanded=False):
+                for example in diagnosis_data['examples']:
+                    st.markdown(f"- {example}")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    elif response_type == 'answer':
+        # Display topic and concept
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            st.info(f"**Subject:** {result.get('subject', 'N/A')}")
+        with col2:
+            st.success(f"**Concept:** {result.get('concept', 'N/A')}")
+        
+        # Expert System Rule (Original)
+        with st.expander("📖 Expert System Rule (Click to expand)", expanded=False):
+            st.markdown('<div class="expert-rule-box">', unsafe_allow_html=True)
+            st.markdown(result.get('expert_rule', 'N/A'))
+            st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Refined Response (LLM-enhanced)
+        st.markdown("### 🌟 AI-Enhanced Explanation")
+        st.markdown('<div class="refined-response-box">', unsafe_allow_html=True)
+        st.markdown(result['content'])
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Examples
+        if result.get('examples'):
+            st.markdown("### 💡 Examples")
+            for example in result['examples']:
+                st.markdown(f"- {example}")
     
-    examples = {
-        "Physics": "What is Newton's law of motion?",
-        "Biology": "Explain photosynthesis",
-        "Chemistry": "What are acids and bases?",
-        "Mathematics": "How do I solve algebraic equations?",
-        "History": "Tell me about Sri Lankan independence",
-        "Study Guide": "How can I improve my memory?"
-    }
-    
-    cols = st.columns(3)
-    for i, (subject, example) in enumerate(examples.items()):
-        with cols[i % 3]:
-            if st.button(f"{config.SUBJECTS[subject]['icon']} {example}", key=f"example_{i}"):
-                st.session_state.example_question = example
-                st.rerun()
+    elif response_type == 'error':
+        st.error(result['content'])
 
 
 def main():
-    """Main application logic."""
+    """Main application."""
     
-    # Initialize
-    initialize_session_state()
+    # Initialize session state for orchestrator if not exists
+    if 'orchestrator' not in st.session_state:
+        st.session_state.orchestrator = SystemOrchestrator()
     
-    # Display UI components
-    display_header()
-    language, use_llm = display_sidebar()
+    orchestrator = st.session_state.orchestrator
     
-    # Check for example question
-    if hasattr(st.session_state, 'example_question'):
-        question = st.session_state.example_question
-        del st.session_state.example_question
-        process_and_display_response(question, language, use_llm)
-        st.rerun()
+    # Initialize messages if not exists
+    if 'messages' not in st.session_state:
+        st.session_state.messages = []
     
-    # Question input
-    question, submit = display_question_input()
+    # Header
+    st.markdown('<p class="main-header">🎓 EduMentor</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Your Intelligent O/L Tutor with Traditional Expert Systems</p>', unsafe_allow_html=True)
     
-    # Process question
-    if submit:
-        process_and_display_response(question, language, use_llm)
+    # Sidebar
+    with st.sidebar:
+        st.markdown("## ℹ️ System Architecture")
+        st.markdown("""
+        **New Design:**
+        1. 🎯 **Intent Classifier** (LLM)
+           - Understands your question
+           - Routes to correct subject
+        
+        2. 🎓 **Expert Systems** (@Rule-based)
+           - Biology, Physics, Chemistry, Math, History
+           - Traditional Experta inference engine
+           - Pattern matching with @Rule decorators
+        
+        3. 🌟 **Response Refiner** (LLM)
+           - Makes expert output friendly
+           - NO new facts added
+           - Pure language enhancement
+        
+        4. 🧠 **Conversation Memory**
+           - Remembers context
+           - Helps with clarifications
+        """)
+        
+        st.markdown("---")
+        
+        # Stats
+        if st.button("📊 View Conversation Stats"):
+            stats = orchestrator.get_conversation_stats()
+            st.json(stats)
+        
+        if st.button("🗑️ Clear History"):
+            orchestrator.clear_conversation()
+            st.success("Conversation cleared!")
+            st.rerun()
+        
+        st.markdown("---")
+        st.markdown("### 📚 Available Subjects")
+        st.markdown("""
+        - ✅ Biology (Information)
+        - ✅ Physics (Information)
+        - ✅ Chemistry (Information)
+        - ✅ Study Guide (Diagnostic)
+        - ⏳ Mathematics (coming soon)
+        - ⏳ History (coming soon)
+        
+        **Two Expert Types:**
+        - 🔵 **Information**: Direct Q&A
+        - 🟢 **Diagnostic**: Progressive questioning
+        """)
     
-    # Display history
-    display_conversation_history()
+    # Main content area
+    st.markdown("---")
     
-    # Display examples
-    display_quick_examples()
+    # Display chat history
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            if message["role"] == "assistant":
+                display_response(message["content"])
+            else:
+                st.markdown(message["content"])
     
-    # Footer
-    st.divider()
-    st.markdown(f"""
-    <div style='text-align: center; color: #888; padding: 2rem;'>
-        <p><strong>{config.SYSTEM_NAME} v{config.SYSTEM_VERSION}</strong></p>
-        <p>{config.PHASE}</p>
-        <p>Powered by Experta + Gemini AI | Multi-Agent System with 6 Specialized Agents</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Chat input
+    if prompt := st.chat_input("Ask me anything about O/L subjects..."):
+        # Display user message
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        # Process query
+        with st.chat_message("assistant"):
+            with st.spinner("🤔 Thinking..."):
+                result = orchestrator.process_query(prompt)
+                display_response(result)
+                st.session_state.messages.append({"role": "assistant", "content": result})
+    
+    # Examples to try
+    st.markdown("---")
+    st.markdown("### 💭 Example Questions")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        if st.button("What is photosynthesis?"):
+            st.session_state.messages.append({"role": "user", "content": "What is photosynthesis?"})
+            st.rerun()
+    
+    with col2:
+        if st.button("Explain forces"):
+            st.session_state.messages.append({"role": "user", "content": "Explain forces"})
+            st.rerun()
+    
+    with col3:
+        if st.button("How does respiration work?"):
+            st.session_state.messages.append({"role": "user", "content": "How does respiration work?"})
+            st.rerun()
+    
+    with col4:
+        if st.button("I'm struggling with studies"):
+            st.session_state.messages.append({"role": "user", "content": "I'm struggling with my studies"})
+            st.rerun()
 
 
 if __name__ == "__main__":
