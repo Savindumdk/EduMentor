@@ -1,0 +1,10 @@
+# Phase 1: Core Dependencies for Expert System
+# Note: frozendict 2.0.2+ is required for Python 3.10+ compatibility
+# experta 1.9.4 officially requires frozendict==1.2 but works with 2.0.2+
+frozendict==2.0.2
+experta==1.9.4
+streamlit==1.31.0
+
+# Phase 2+3: Multi-Agent System + LLM Integration
+google-generativeai>=0.3.0
+python-dotenv>=1.0.0
