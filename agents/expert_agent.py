@@ -1,7 +1,8 @@
 """
 Expert Agent
 ------------
-Main agent that coordinates all expert systems using them as tools.
+Main agent that coordinates subject expert systems (Biology, Physics, Chemistry).
+Study Guide is now a standalone system in a separate tab.
 Uses Gemini LLM to understand queries and select appropriate expert tools.
 """
 
@@ -13,14 +14,13 @@ from dotenv import load_dotenv
 from experts.biology_expert import BiologyExpert
 from experts.physics_expert import PhysicsExpert
 from experts.chemistry_expert import ChemistryExpert
-from experts.study_guide_expert import StudyGuideExpert
 
 load_dotenv()
 
 
 class ExpertAgent:
     """
-    Main agent that uses expert systems as tools.
+    Main agent that uses subject expert systems as tools.
     
     The agent:
     1. Receives a user query
@@ -28,10 +28,12 @@ class ExpertAgent:
     3. Extracts appropriate query parameters
     4. Calls the expert system tool
     5. Returns the result
+    
+    Note: Study Guide Expert is now standalone in separate tab.
     """
     
     def __init__(self):
-        """Initialize the Expert Agent with all tools."""
+        """Initialize the Expert Agent with subject expert tools."""
         # Initialize Gemini
         api_key = os.getenv('GEMINI_API_KEY')
         if not api_key:
@@ -40,12 +42,11 @@ class ExpertAgent:
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
         
-        # Initialize expert system tools
+        # Initialize subject expert system tools (Study Guide moved to separate tab)
         self.tools = {
             'biology_expert': BiologyExpert(),
             'physics_expert': PhysicsExpert(),
-            'chemistry_expert': ChemistryExpert(),
-            'study_guide_expert': StudyGuideExpert()
+            'chemistry_expert': ChemistryExpert()
         }
         
         # Reset all expert systems
@@ -56,10 +57,9 @@ class ExpertAgent:
         self.conversation_history = []
         
         print("✅ Expert Agent initialized with tools:")
-        print(f"   - Biology Expert (Knowledge Base)")
-        print(f"   - Physics Expert (Knowledge Base)")
-        print(f"   - Chemistry Expert (Knowledge Base)")
-        print(f"   - Study Guide Expert (Diagnostic)")
+        print("   - Biology Expert (Knowledge Base)")
+        print("   - Physics Expert (Knowledge Base)")
+        print("   - Chemistry Expert (Knowledge Base)")
     
     def _get_available_topics(self, expert_name: str) -> List[str]:
         """
@@ -532,6 +532,64 @@ Keep it well-structured but concise (4-6 paragraphs or use sections)."""
         print(f"   Query Topics: {', '.join(topics)}")
         print(f"   Reasoning: {analysis['reasoning']}\n")
         
+        # SPECIAL HANDLING FOR STUDY GUIDE EXPERT
+        # Study guide expert maintains state across interactions (traditional expert system behavior)
+        if analysis['tool_name'] == 'study_guide_expert':
+            print("🔧 Step 2: Activating Study Guide (Diagnostic Mode)...")
+            expert = self.tools['study_guide_expert']
+            
+            # Only reset if NOT already in an active diagnostic session
+            # This allows the expert to maintain state like a traditional expert system
+            if expert.has_active_session():
+                print("   ♻️ Continuing existing diagnostic session...")
+            else:
+                print("   🔄 Starting new diagnostic session...")
+                expert.reset()
+            
+            expert.run()
+            
+            if expert.requires_clarification():
+                print("   ✅ Next question ready\n")
+                print(f"{'='*60}\n")
+                return {
+                    'response': expert.get_clarification_question(),
+                    'tool_used': 'study_guide_expert',
+                    'query_topics': ['study_guidance'],
+                    'success': True,
+                    'needs_clarification': True,
+                    'raw_expert_response': None,
+                    'analysis': analysis,
+                    'confidence_metrics': None
+                }
+            elif expert.is_diagnosis_complete():
+                print("   ✅ Diagnosis complete\n")
+                diagnosis = expert.get_response()
+                print(f"{'='*60}\n")
+                return {
+                    'response': diagnosis,
+                    'tool_used': 'study_guide_expert',
+                    'query_topics': ['study_guidance'],
+                    'success': True,
+                    'needs_clarification': False,
+                    'raw_expert_response': diagnosis,
+                    'analysis': analysis,
+                    'confidence_metrics': None
+                }
+            else:
+                print("   ⚠️ Unknown state\n")
+                print(f"{'='*60}\n")
+                return {
+                    'response': "Let me help you with your studies. What specific area are you struggling with?",
+                    'tool_used': 'study_guide_expert',
+                    'query_topics': ['study_guidance'],
+                    'success': False,
+                    'needs_clarification': False,
+                    'raw_expert_response': None,
+                    'analysis': analysis,
+                    'confidence_metrics': None
+                }
+        
+        # NORMAL HANDLING FOR INFORMATION EXPERTS (Biology, Physics, Chemistry)
         # Step 2: Execute expert system tool for EACH topic
         print(f"🔧 Step 2: Executing expert tool for {len(topics)} topic(s)...")
         all_responses = []
