@@ -13,6 +13,12 @@ except ImportError:
     GEMINI_AVAILABLE = False
     print("Warning: google-generativeai not installed. LLM features will be disabled.")
 
+# Import config for model name
+try:
+    from config import LLM_MODEL
+except ImportError:
+    LLM_MODEL = "gemini-1.5-flash"  # Default fallback
+
 
 class GeminiInterface:
     """
@@ -20,17 +26,18 @@ class GeminiInterface:
     Enhances expert system responses with natural language.
     """
     
-    def __init__(self, api_key=None):
+    def __init__(self, api_key=None, model_name=None):
         self.api_key = api_key or os.getenv('GEMINI_API_KEY')
+        self.model_name = model_name or LLM_MODEL
         self.model = None
         self.enabled = False
         
         if GEMINI_AVAILABLE and self.api_key:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-pro')
+                self.model = genai.GenerativeModel(self.model_name)
                 self.enabled = True
-                print("✓ Gemini LLM initialized successfully")
+                print(f"✓ Gemini LLM initialized successfully (model: {self.model_name})")
             except Exception as e:
                 print(f"Warning: Could not initialize Gemini: {e}")
                 self.enabled = False

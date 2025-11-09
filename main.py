@@ -8,6 +8,10 @@ Streamlit-based user interface with natural language enhancement.
 import streamlit as st
 import os
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import MAS components
 from agents.coordinator_agent import CoordinatorAgent
@@ -315,7 +319,7 @@ def display_quick_examples():
         "Chemistry": "What are acids and bases?",
         "Mathematics": "How do I solve algebraic equations?",
         "History": "Tell me about Sri Lankan independence",
-        "Study Tips": "How can I improve my memory?"
+        "Study Guide": "How can I improve my memory?"
     }
     
     cols = st.columns(3)

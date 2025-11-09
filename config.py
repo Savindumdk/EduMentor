@@ -78,7 +78,7 @@ ENABLE_AGENT_STATISTICS = True
 # Phase 3: LLM Configuration
 LLM_ENABLED = True  # Set to False to use only expert system
 LLM_PROVIDER = "gemini"  # Using Google Gemini
-LLM_MODEL = "gemini-pro"
+LLM_MODEL = "gemini-2.5-flash"  # Available models: gemini-2.5-flash, gemini-2.5-pro, gemini-flash-latest
 LLM_TEMPERATURE = 0.7
 LLM_MAX_TOKENS = 500
 FALLBACK_TO_EXPERT_SYSTEM = True  # If LLM fails, use expert system

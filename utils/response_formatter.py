@@ -21,16 +21,28 @@ class ResponseFormatter:
         Returns:
             dict: Formatted response
         """
+        # Get both original and enhanced explanations
+        original_explanation = response_data.get('explanation', '')
+        enhanced_explanation = response_data.get('enhanced_explanation', '')
+        llm_enhanced = response_data.get('llm_enhanced', False)
+        
+        # If LLM enhanced, show both original KB rule and LLM enhancement
+        if llm_enhanced and enhanced_explanation and original_explanation:
+            explanation = f"**📖 Knowledge Base Rule:**\n\n{original_explanation}\n\n---\n\n**🌟 AI-Enhanced Explanation:**\n\n{enhanced_explanation}"
+        else:
+            explanation = enhanced_explanation or original_explanation
+        
         formatted = {
             'timestamp': datetime.now().isoformat(),
             'success': response_data.get('matched', False),
             'concept': response_data.get('concept', 'Unknown'),
             'topic': response_data.get('topic', 'General'),
-            'explanation': response_data.get('enhanced_explanation', 
-                                           response_data.get('explanation', '')),
+            'explanation': explanation,
+            'original_explanation': original_explanation,  # Keep original for reference
+            'enhanced_explanation': enhanced_explanation if llm_enhanced else None,
             'examples': response_data.get('examples', []),
             'agent_used': response_data.get('agent', 'Unknown'),
-            'llm_enhanced': response_data.get('llm_enhanced', False),
+            'llm_enhanced': llm_enhanced,
             'language': response_data.get('language', 'en')
         }
         
