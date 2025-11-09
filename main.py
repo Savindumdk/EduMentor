@@ -98,13 +98,70 @@ def display_response(result: dict):
         st.markdown('</div>', unsafe_allow_html=True)
         return
     
-    # Display tool used
+    # Display tool used and confidence metrics
     tool_used = result.get('tool_used', 'Unknown')
-    st.info(f"**🔧 Tool Used:** {tool_used.replace('_', ' ').title()}")
+    confidence_data = result.get('confidence_metrics')
+    
+    # Create header with tool and confidence
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.info(f"**🔧 Tool Used:** {tool_used.replace('_', ' ').title()}")
+    with col2:
+        if confidence_data:
+            cf = confidence_data.get('aggregate_certainty', 0)
+            level = confidence_data.get('confidence_level', 'UNKNOWN')
+            
+            # Color code based on confidence level
+            if level == 'HIGH':
+                color = '#4CAF50'  # Green
+                emoji = '🟢'
+            elif level == 'MEDIUM':
+                color = '#FF9800'  # Orange
+                emoji = '🟡'
+            elif level == 'LOW':
+                color = '#F44336'  # Red
+                emoji = '🔴'
+            else:
+                color = '#9E9E9E'  # Gray
+                emoji = '⚪'
+            
+            st.markdown(f"""
+            <div style="background-color: {color}20; padding: 10px; border-radius: 5px; border-left: 4px solid {color};">
+                <div style="font-size: 12px; color: #666;">Confidence</div>
+                <div style="font-size: 20px; font-weight: bold; color: {color};">
+                    {emoji} {cf:.1%} <span style="font-size: 14px;">({level})</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     
     # Display the enhanced response
-    st.markdown("### � Answer")
+    st.markdown("### 💡 Answer")
     st.markdown(result['response'])
+    
+    # Show confidence details in expander
+    if confidence_data and confidence_data.get('num_rules_fired', 0) > 0:
+        with st.expander("📊 Confidence Metrics", expanded=False):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.metric("Aggregate Certainty", f"{confidence_data.get('aggregate_certainty', 0):.3f}")
+                st.metric("Average Certainty", f"{confidence_data.get('average_certainty', 0):.3f}")
+                st.metric("Rules Fired", confidence_data.get('num_rules_fired', 0))
+            
+            with col2:
+                st.metric("Max Certainty", f"{confidence_data.get('max_certainty', 0):.3f}")
+                st.metric("Min Certainty", f"{confidence_data.get('min_certainty', 0):.3f}")
+                st.metric("Confidence Level", confidence_data.get('confidence_level', 'N/A'))
+            
+            # Show distribution if available
+            if confidence_data.get('certainty_distribution'):
+                st.markdown("**Certainty Distribution:**")
+                dist = confidence_data['certainty_distribution']
+                cols = st.columns(4)
+                for i, (level, count) in enumerate(dist.items()):
+                    if count > 0:
+                        with cols[i]:
+                            st.metric(level, count)
     
     # Show expert system details in expander
     if result.get('raw_expert_response'):
@@ -116,6 +173,8 @@ def display_response(result: dict):
                     st.markdown(f"**Concept:** {expert_data['concept']}")
                 if expert_data.get('topic'):
                     st.markdown(f"**Topic:** {expert_data['topic']}")
+                if expert_data.get('certainty_factor'):
+                    st.markdown(f"**Certainty Factor:** {expert_data['certainty_factor']:.3f}")
                 if expert_data.get('explanation'):
                     st.markdown("**Expert Explanation:**")
                     st.markdown(expert_data['explanation'])
@@ -123,6 +182,30 @@ def display_response(result: dict):
                     st.markdown("**Examples:**")
                     for ex in expert_data['examples']:
                         st.markdown(f"- {ex}")
+            elif isinstance(expert_data, list):
+                # Display multiple responses in a flat structure (no nested expanders)
+                st.markdown(f"**{len(expert_data)} rules matched:**")
+                for i, data in enumerate(expert_data, 1):
+                    st.markdown("---")
+                    st.markdown(f"### Response {i}: {data.get('concept', 'N/A')}")
+                    if data.get('certainty_factor'):
+                        cf = data['certainty_factor']
+                        level = data.get('confidence_level', 'N/A')
+                        # Color code the CF
+                        if level == 'HIGH':
+                            color = '#4CAF50'
+                        elif level == 'MEDIUM':
+                            color = '#FF9800'
+                        else:
+                            color = '#F44336'
+                        st.markdown(f"**Certainty Factor:** <span style='color: {color}; font-weight: bold;'>{cf:.3f} ({level})</span>", unsafe_allow_html=True)
+                    if data.get('explanation'):
+                        st.markdown("**Explanation:**")
+                        st.markdown(data['explanation'][:300] + "..." if len(data['explanation']) > 300 else data['explanation'])
+                    if data.get('examples') and len(data['examples']) > 0:
+                        st.markdown("**Examples:**")
+                        for ex in data['examples'][:3]:  # Show first 3 examples
+                            st.markdown(f"- {ex}")
     
     # Show analysis details
     if result.get('analysis'):

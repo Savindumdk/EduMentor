@@ -29,6 +29,7 @@ class BiologyExpert(KnowledgeEngine):
         self.all_responses = []  # Collect all matching rules
         self.needs_clarification = False
         self.clarification_question = None
+        self.certainty_factors = {}  # Store CF for each response
 
     def get_response(self):
         """Return the expert's response. Returns all responses if multiple matches."""
@@ -36,11 +37,118 @@ class BiologyExpert(KnowledgeEngine):
             return self.all_responses
         return self.response
     
-    def add_response(self, response_dict):
-        """Add a response to the collection of all matching rules."""
+    def add_response(self, response_dict, certainty_factor=None):
+        """
+        Add a response to the collection of all matching rules.
+        
+        Args:
+            response_dict: The response data
+            certainty_factor: CF value between -1.0 to 1.0
+                             1.0 = definitely true
+                             0.8-0.99 = highly confident
+                             0.5-0.79 = moderately confident
+                             0.2-0.49 = somewhat confident
+                             0.0 = unknown
+                             -1.0 = definitely false
+        """
+        # Calculate CF based on rule specificity if not provided
+        if certainty_factor is None:
+            certainty_factor = self._calculate_default_cf(response_dict)
+        
+        # Add CF to response
+        response_dict['certainty_factor'] = certainty_factor
+        response_dict['confidence_level'] = self._classify_confidence(certainty_factor)
+        
         self.all_responses.append(response_dict)
         # Keep the last response as the primary one
         self.response = response_dict
+    
+    def _calculate_default_cf(self, response_dict) -> float:
+        """
+        Calculate default certainty factor based on response characteristics.
+        Uses salience, specificity, and other factors.
+        """
+        # Base CF for all responses
+        cf = 0.7
+        
+        # Increase CF if response has examples (more concrete)
+        if response_dict.get('examples') and len(response_dict['examples']) > 0:
+            cf += 0.1
+        
+        # Increase CF if response has detailed explanation
+        if response_dict.get('explanation') and len(response_dict['explanation']) > 200:
+            cf += 0.05
+        
+        # Cap at 0.95 (never 100% certain without explicit setting)
+        return min(cf, 0.95)
+    
+    def _classify_confidence(self, cf: float) -> str:
+        """Classify certainty factor into confidence levels"""
+        if cf >= 0.8:
+            return 'HIGH'
+        elif cf >= 0.6:
+            return 'MEDIUM'
+        elif cf >= 0.4:
+            return 'LOW'
+        else:
+            return 'VERY_LOW'
+    
+    def combine_certainty(self, cf1: float, cf2: float) -> float:
+        """
+        Combine multiple certainty factors using standard CF algebra.
+        
+        Rules:
+        - Both positive: cf1 + cf2 * (1 - cf1)
+        - Both negative: cf1 + cf2 * (1 + cf1)
+        - Mixed signs: (cf1 + cf2) / (1 - min(|cf1|, |cf2|))
+        """
+        if cf1 > 0 and cf2 > 0:
+            return cf1 + cf2 * (1 - cf1)
+        elif cf1 < 0 and cf2 < 0:
+            return cf1 + cf2 * (1 + cf1)
+        else:
+            return (cf1 + cf2) / (1 - min(abs(cf1), abs(cf2)))
+    
+    def get_aggregated_confidence(self) -> dict:
+        """
+        Calculate aggregate confidence metrics across all fired rules.
+        
+        Returns:
+            Dictionary with confidence statistics
+        """
+        if not self.all_responses:
+            return {
+                'confidence': 0.0,
+                'confidence_level': 'NONE',
+                'method': 'no_matches',
+                'num_rules_fired': 0
+            }
+        
+        # Extract CFs from responses
+        cfs = [r.get('certainty_factor', 0.5) for r in self.all_responses]
+        
+        # Calculate aggregate CF (combined evidence)
+        if len(cfs) == 1:
+            aggregate_cf = cfs[0]
+        else:
+            aggregate_cf = cfs[0]
+            for cf in cfs[1:]:
+                aggregate_cf = self.combine_certainty(aggregate_cf, cf)
+        
+        return {
+            'aggregate_certainty': aggregate_cf,
+            'average_certainty': sum(cfs) / len(cfs),
+            'max_certainty': max(cfs),
+            'min_certainty': min(cfs),
+            'confidence_level': self._classify_confidence(aggregate_cf),
+            'num_rules_fired': len(self.all_responses),
+            'certainty_distribution': {
+                'HIGH': sum(1 for cf in cfs if cf >= 0.8),
+                'MEDIUM': sum(1 for cf in cfs if 0.6 <= cf < 0.8),
+                'LOW': sum(1 for cf in cfs if 0.4 <= cf < 0.6),
+                'VERY_LOW': sum(1 for cf in cfs if cf < 0.4)
+            }
+        }
     
     def requires_clarification(self):
         """Check if expert needs more information."""
@@ -66,7 +174,7 @@ class BiologyExpert(KnowledgeEngine):
             'topic': 'Biology',
             'subtopic': 'Animal Tissues',
             'examples': ['Epithelial tissue forms protective coverings', 'Connective tissue provides support and connection', 'Muscle tissue enables movement', 'Nervous tissue coordinates body functions']
-        })
+        }, certainty_factor=0.9)  # High confidence - core biology concept, well-established
         self.clarification_question = """Which type of animal tissue would you like to explore?
 1. Epithelial tissue - Covers and protects body surfaces
 2. Connective tissue - Supports and connects other tissues
@@ -135,7 +243,7 @@ class BiologyExpert(KnowledgeEngine):
             'topic': 'Biology',
             'subtopic': 'Cell Division',
             'examples': ['Mitosis produces identical daughter cells for growth and repair', 'Meiosis produces gametes (sex cells) with half the genetic material']
-        })
+        }, certainty_factor=0.95)  # Very high confidence - fundamental biological process
         self.clarification_question = """Which type of cell division would you like to learn about?
 1. Mitosis - Division for growth, repair, and asexual reproduction
 2. Meiosis - Division to produce gametes (sex cells)"""
@@ -325,7 +433,7 @@ class BiologyExpert(KnowledgeEngine):
             'topic': 'Biology',
             'subtopic': 'Photosynthesis',
             'examples': ['Light reactions convert light energy to chemical energy', 'Calvin cycle uses that energy to fix carbon', 'Various factors affect the rate of photosynthesis']
-        })
+        }, certainty_factor=0.92)  # High confidence - core photosynthesis concept
         self.clarification_question = """Which aspect of photosynthesis would you like to explore?
 1. Light reactions (light-dependent reactions)
 2. Calvin cycle (light-independent reactions/dark reactions)

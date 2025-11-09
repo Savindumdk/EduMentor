@@ -559,6 +559,18 @@ Keep it well-structured but concise (4-6 paragraphs or use sections)."""
         
         print(f"   Total matches: {len(all_responses)}\n")
         
+        # Get confidence metrics from the expert if available
+        confidence_metrics = None
+        if len(all_responses) > 0 and hasattr(self.tools[analysis['tool_name']], 'get_aggregated_confidence'):
+            try:
+                confidence_metrics = self.tools[analysis['tool_name']].get_aggregated_confidence()
+                print(f"📊 Confidence Metrics:")
+                print(f"   Aggregate CF: {confidence_metrics.get('aggregate_certainty', 0):.3f}")
+                print(f"   Confidence Level: {confidence_metrics.get('confidence_level', 'N/A')}")
+                print(f"   Rules Fired: {confidence_metrics.get('num_rules_fired', 0)}\n")
+            except Exception as e:
+                print(f"⚠️ Could not get confidence metrics: {e}\n")
+        
         # Step 3: Synthesize if multiple topics or multiple matches
         if len(all_responses) > 1:
             print("✨ Step 3: Synthesizing multiple responses...")
@@ -593,7 +605,8 @@ Keep it well-structured but concise (4-6 paragraphs or use sections)."""
             'success': len(all_responses) > 0,
             'needs_clarification': False,
             'raw_expert_response': all_responses,
-            'analysis': analysis
+            'analysis': analysis,
+            'confidence_metrics': confidence_metrics  # Add confidence metrics
         }
         
         # Store in conversation history
