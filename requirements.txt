@@ -1,0 +1,7 @@
+# Phase 1: Core Dependencies for Expert System
+experta==1.9.4
+streamlit==1.31.0
+frozendict==2.3.4
+
+# Phase 2+3: Multi-Agent System + LLM Integration
+google-generativeai>=0.3.0
