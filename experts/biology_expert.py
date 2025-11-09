@@ -50,6 +50,325 @@ class BiologyExpert(KnowledgeEngine):
         """Get the clarification question to ask user."""
         return self.clarification_question
 
+    # ==================== PROGRESSIVE QUESTIONING RULES ====================
+    # High salience rules for structured, progressive questioning
+
+    # ========== ANIMAL TISSUES PROGRESSIVE QUESTIONING ==========
+    
+    @Rule(Fact(query_topic='animal_tissues'),
+          NOT(Fact(tissue_type=W())),
+          salience=100)
+    def ask_animal_tissue_type(self):
+        """Ask which type of animal tissue the user wants to learn about."""
+        self.add_response({
+            'concept': 'Animal Tissues Overview',
+            'explanation': """Animal tissues are groups of similar cells that work together to perform specific functions in the body. There are four main types of animal tissues, each with distinct structures and roles.""",
+            'topic': 'Biology',
+            'subtopic': 'Animal Tissues',
+            'examples': ['Epithelial tissue forms protective coverings', 'Connective tissue provides support and connection', 'Muscle tissue enables movement', 'Nervous tissue coordinates body functions']
+        })
+        self.clarification_question = """Which type of animal tissue would you like to explore?
+1. Epithelial tissue - Covers and protects body surfaces
+2. Connective tissue - Supports and connects other tissues
+3. Muscle tissue - Enables body movement
+4. Nervous tissue - Transmits signals and coordinates functions"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='animal_tissues'),
+          Fact(tissue_type='epithelial'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_epithelial_details(self):
+        """Ask what aspect of epithelial tissue to explore."""
+        self.clarification_question = """What aspect of epithelial tissue would you like to know about?
+1. Structure and characteristics
+2. Classification and types (simple vs stratified, squamous vs columnar)
+3. Functions and locations in the body"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='animal_tissues'),
+          Fact(tissue_type='connective'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_connective_details(self):
+        """Ask what aspect of connective tissue to explore."""
+        self.clarification_question = """What aspect of connective tissue would you like to know about?
+1. Structure and components (cells, fibers, matrix)
+2. Classification and types (loose, dense, specialized)
+3. Functions and examples (bone, blood, cartilage)"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='animal_tissues'),
+          Fact(tissue_type='muscle'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_muscle_details(self):
+        """Ask what aspect of muscle tissue to explore."""
+        self.clarification_question = """What aspect of muscle tissue would you like to know about?
+1. Types of muscle tissue (skeletal, smooth, cardiac)
+2. Structure and properties
+3. Functions and mechanisms of contraction"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='animal_tissues'),
+          Fact(tissue_type='nervous'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_nervous_details(self):
+        """Ask what aspect of nervous tissue to explore."""
+        self.clarification_question = """What aspect of nervous tissue would you like to know about?
+1. Structure (neurons and neuroglia)
+2. Types of neurons and their functions
+3. Signal transmission and nerve impulses"""
+        self.needs_clarification = True
+
+    # ========== CELL DIVISION PROGRESSIVE QUESTIONING ==========
+    
+    @Rule(Fact(query_topic='cell_division'),
+          NOT(Fact(division_type=W())),
+          salience=100)
+    def ask_division_type(self):
+        """Ask which type of cell division to explore."""
+        self.add_response({
+            'concept': 'Cell Division Overview',
+            'explanation': """Cell division is the process by which a parent cell divides into two or more daughter cells. There are two main types of cell division in living organisms, each serving different purposes.""",
+            'topic': 'Biology',
+            'subtopic': 'Cell Division',
+            'examples': ['Mitosis produces identical daughter cells for growth and repair', 'Meiosis produces gametes (sex cells) with half the genetic material']
+        })
+        self.clarification_question = """Which type of cell division would you like to learn about?
+1. Mitosis - Division for growth, repair, and asexual reproduction
+2. Meiosis - Division to produce gametes (sex cells)"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='cell_division'),
+          Fact(division_type='mitosis'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_mitosis_detail(self):
+        """Ask what aspect of mitosis to explore."""
+        self.clarification_question = """What aspect of mitosis would you like to know about?
+1. Process overview and key features
+2. Stages of mitosis (prophase, metaphase, anaphase, telophase)
+3. Purpose and significance in organisms"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='cell_division'),
+          Fact(division_type='meiosis'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_meiosis_detail(self):
+        """Ask what aspect of meiosis to explore."""
+        self.clarification_question = """What aspect of meiosis would you like to know about?
+1. Process overview and key features
+2. Stages of meiosis (Meiosis I and Meiosis II)
+3. Importance in sexual reproduction and genetic variation"""
+        self.needs_clarification = True
+
+    # ========== RESPIRATION PROGRESSIVE QUESTIONING ==========
+    
+    @Rule(Fact(query_topic='respiration'),
+          NOT(Fact(respiration_type=W())),
+          salience=100)
+    def ask_respiration_type(self):
+        """Ask which type of respiration to explore."""
+        self.add_response({
+            'concept': 'Respiration Overview',
+            'explanation': """Respiration is the process by which organisms break down glucose to release energy for cellular activities. This process can occur with or without oxygen, and happens at the cellular level in all living organisms.""",
+            'topic': 'Biology',
+            'subtopic': 'Respiration',
+            'examples': ['Aerobic respiration uses oxygen and produces more ATP', 'Anaerobic respiration occurs without oxygen', 'Cellular respiration happens in mitochondria']
+        })
+        self.clarification_question = """Which type of respiration would you like to learn about?
+1. Aerobic respiration - Respiration using oxygen (most efficient)
+2. Anaerobic respiration - Respiration without oxygen (fermentation)
+3. Cellular respiration - The biochemical process in cells"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='respiration'),
+          Fact(respiration_type='aerobic'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_aerobic_details(self):
+        """Ask what aspect of aerobic respiration to explore."""
+        self.clarification_question = """What aspect of aerobic respiration would you like to know about?
+1. Process and stages (glycolysis, Krebs cycle, electron transport)
+2. Products and energy yield (ATP production)
+3. Location and requirements (mitochondria, oxygen)"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='respiration'),
+          Fact(respiration_type='anaerobic'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_anaerobic_details(self):
+        """Ask what aspect of anaerobic respiration to explore."""
+        self.clarification_question = """What aspect of anaerobic respiration would you like to know about?
+1. Types of fermentation (lactic acid, alcoholic)
+2. Process and products
+3. Comparison with aerobic respiration and when it occurs"""
+        self.needs_clarification = True
+
+    # ========== BLOOD COMPONENTS PROGRESSIVE QUESTIONING ==========
+    
+    @Rule(Fact(query_topic='blood'),
+          NOT(Fact(blood_component=W())),
+          salience=100)
+    def ask_blood_component(self):
+        """Ask which blood component to explore."""
+        self.add_response({
+            'concept': 'Blood Composition Overview',
+            'explanation': """Blood is a specialized connective tissue that circulates throughout the body. It consists of both cellular components (blood cells) and a liquid component (plasma), each playing vital roles in maintaining life.""",
+            'topic': 'Biology',
+            'subtopic': 'Blood',
+            'examples': ['Red blood cells carry oxygen', 'White blood cells fight infections', 'Platelets help in blood clotting', 'Plasma transports nutrients and wastes']
+        })
+        self.clarification_question = """Which blood component would you like to explore?
+1. Red blood cells (RBC) - Oxygen transport
+2. White blood cells (WBC) - Immune defense
+3. Platelets - Blood clotting
+4. Plasma - Liquid component and transport medium"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='blood'),
+          Fact(blood_component='rbc'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_rbc_details(self):
+        """Ask what aspect of red blood cells to explore."""
+        self.clarification_question = """What aspect of red blood cells would you like to know about?
+1. Structure and characteristics (biconcave shape, no nucleus)
+2. Function and hemoglobin role in oxygen transport
+3. Production, lifespan, and disorders (anemia, etc.)"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='blood'),
+          Fact(blood_component='wbc'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_wbc_details(self):
+        """Ask what aspect of white blood cells to explore."""
+        self.clarification_question = """What aspect of white blood cells would you like to know about?
+1. Types of white blood cells (lymphocytes, neutrophils, etc.)
+2. Functions in immune response and defense
+3. Production and disorders related to WBC"""
+        self.needs_clarification = True
+
+    # ========== DIGESTION PROGRESSIVE QUESTIONING ==========
+    
+    @Rule(Fact(query_topic='digestion'),
+          NOT(Fact(digestion_aspect=W())),
+          salience=100)
+    def ask_digestion_aspect(self):
+        """Ask which aspect of digestion to explore."""
+        self.add_response({
+            'concept': 'Digestion Overview',
+            'explanation': """Digestion is the process of breaking down food into smaller molecules that can be absorbed and used by the body. This process involves both physical breakdown and chemical decomposition through various organs and enzymes.""",
+            'topic': 'Biology',
+            'subtopic': 'Digestion',
+            'examples': ['Mechanical digestion physically breaks down food', 'Chemical digestion uses enzymes to break molecular bonds', 'Different organs have specialized roles in the digestive process']
+        })
+        self.clarification_question = """Which aspect of digestion would you like to explore?
+1. Mechanical digestion - Physical breakdown of food
+2. Chemical digestion - Enzymatic breakdown and processes
+3. Digestive organs - Structure and functions of the digestive system"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='digestion'),
+          Fact(digestion_aspect='mechanical'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_mechanical_digestion_details(self):
+        """Ask what aspect of mechanical digestion to explore."""
+        self.clarification_question = """What aspect of mechanical digestion would you like to know about?
+1. Processes and mechanisms (chewing, churning, segmentation)
+2. Organs involved (mouth, stomach, intestines)
+3. Importance and relationship to chemical digestion"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='digestion'),
+          Fact(digestion_aspect='chemical'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_chemical_digestion_details(self):
+        """Ask what aspect of chemical digestion to explore."""
+        self.clarification_question = """What aspect of chemical digestion would you like to know about?
+1. Digestive enzymes and their specific functions
+2. Process and products of chemical breakdown
+3. Locations where different chemical digestion occurs"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='digestion'),
+          Fact(digestion_aspect='organs'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_digestive_organ_details(self):
+        """Ask which digestive organ to explore."""
+        self.clarification_question = """Which digestive organ would you like to learn about?
+1. Mouth and esophagus - Ingestion and transport
+2. Stomach - Storage and initial digestion
+3. Small intestine - Main digestion and absorption
+4. Large intestine - Water absorption and waste formation
+5. Accessory organs - Liver, pancreas, gallbladder"""
+        self.needs_clarification = True
+
+    # ========== PHOTOSYNTHESIS PROGRESSIVE QUESTIONING ==========
+    
+    @Rule(Fact(query_topic='photosynthesis'),
+          NOT(Fact(photosynthesis_aspect=W())),
+          salience=100)
+    def ask_photosynthesis_aspect(self):
+        """Ask which aspect of photosynthesis to explore."""
+        self.add_response({
+            'concept': 'Photosynthesis Overview',
+            'explanation': """Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize nutrients from carbon dioxide and water. This process converts light energy into chemical energy stored in glucose molecules.""",
+            'topic': 'Biology',
+            'subtopic': 'Photosynthesis',
+            'examples': ['Light reactions convert light energy to chemical energy', 'Calvin cycle uses that energy to fix carbon', 'Various factors affect the rate of photosynthesis']
+        })
+        self.clarification_question = """Which aspect of photosynthesis would you like to explore?
+1. Light reactions (light-dependent reactions)
+2. Calvin cycle (light-independent reactions/dark reactions)
+3. Factors affecting photosynthesis rate"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='photosynthesis'),
+          Fact(photosynthesis_aspect='light_reactions'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_light_reactions_details(self):
+        """Ask what aspect of light reactions to explore."""
+        self.clarification_question = """What aspect of light reactions would you like to know about?
+1. Process and location (thylakoid membranes)
+2. Products (ATP, NADPH, O2) and their roles
+3. Photosystems and electron transport chain"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='photosynthesis'),
+          Fact(photosynthesis_aspect='calvin_cycle'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_calvin_cycle_details(self):
+        """Ask what aspect of Calvin cycle to explore."""
+        self.clarification_question = """What aspect of the Calvin cycle would you like to know about?
+1. Process and stages (carbon fixation, reduction, regeneration)
+2. Location (stroma) and requirements
+3. Products and significance (glucose formation)"""
+        self.needs_clarification = True
+
+    @Rule(Fact(query_topic='photosynthesis'),
+          Fact(photosynthesis_aspect='factors'),
+          NOT(Fact(detail_level=W())),
+          salience=90)
+    def ask_photosynthesis_factors_details(self):
+        """Ask which factors affecting photosynthesis to explore."""
+        self.clarification_question = """Which factors affecting photosynthesis would you like to learn about?
+1. Light intensity and wavelength
+2. Carbon dioxide concentration
+3. Temperature and water availability
+4. Limiting factors and rate optimization"""
+        self.needs_clarification = True
+
     # ==================== COMPREHENSIVE KNOWLEDGE BASE RULES ====================
     # Integrated from textbook knowledge base
 
@@ -639,12 +958,126 @@ class BiologyExpert(KnowledgeEngine):
         """Multicellular animal bodies are primarily composed of a few main types of tissues, each specialized for distinct functions."""
         self.add_response({
             'concept': 'Main Types of Animal Tissues',
-            'explanation': """Multicellular animal bodies are primarily composed of a few main types of tissues, each specialized for distinct functions.""",
+            'explanation': """Multicellular animal bodies are primarily composed of a few main types of tissues, each specialized for distinct functions.
+
+The four main types are:
+1. **Epithelial tissue** - Lines surfaces and cavities
+2. **Connective tissue** - Connects and supports other tissues
+3. **Muscle tissue** - Enables movement
+4. **Nervous tissue** - Transmits signals
+
+Would you like to learn more about a specific tissue type?""",
             'topic': 'Biology',
             'subtopic': 'Animal Tissues',
-            'examples': ["Epithelial tissue", "Connective tissue", "Muscle tissue"]
+            'examples': ["Epithelial tissue", "Connective tissue", "Muscle tissue", "Nervous tissue"]
         })
-        # Multiple rules can fire
+        # Offer progressive questioning
+        self.clarification_question = """Which tissue type would you like to explore in detail?
+
+1. **Epithelial tissue** - Covering and lining tissues
+2. **Connective tissue** - Support and connection
+3. **Muscle tissue** - Movement and contraction
+4. **Nervous tissue** - Signal transmission
+
+Type: epithelial, connective, muscle, or nervous"""
+        self.needs_clarification = True
+
+    # PROGRESSIVE QUESTIONING - Tissue Details
+    @Rule(Fact(query_topic='main_types_of_animal_tissues'),
+          Fact(tissue_type='epithelial'))
+    def explain_epithelial_detailed(self):
+        """Detailed explanation of epithelial tissue."""
+        self.add_response({
+            'concept': 'Epithelial Tissue (Detailed)',
+            'explanation': """Epithelial tissue lines the free surfaces (both internal and external) of the vertebrate body. It can be composed of a single layer of cells or several cell layers.
+
+**Key Features:**
+- Cells placed on a basement membrane
+- Tightly packed cells
+- Nerve supply present, but no blood supply
+- Functions: Protection, absorption, secretion, sensation
+
+**Examples:**
+- Skin epidermis (protection)
+- Lining of digestive tract (absorption)
+- Lining of respiratory tract (secretion)""",
+            'topic': 'Biology',
+            'subtopic': 'Animal Tissues - Epithelial',
+            'examples': ["Wall of blood capillaries", "Skin (Epidermis)", "Lining of nasal cavity"]
+        })
+
+    @Rule(Fact(query_topic='main_types_of_animal_tissues'),
+          Fact(tissue_type='connective'))
+    def explain_connective_detailed(self):
+        """Detailed explanation of connective tissue."""
+        self.add_response({
+            'concept': 'Connective Tissue (Detailed)',
+            'explanation': """Connective tissue is composed of various cells and fibres embedded in a large matrix. Most types have nerve and blood supply. Its primary role is to connect tissues and organs and provide structural support.
+
+**Key Features:**
+- Cells and fibres in a matrix
+- Has blood and nerve supply
+- Functions: Connection, support, protection, transport
+
+**Types:**
+- Blood tissue (special connective tissue)
+- Bone tissue (rigid support)
+- Cartilage (flexible support)
+- Adipose tissue (fat storage)""",
+            'topic': 'Biology',
+            'subtopic': 'Animal Tissues - Connective',
+            'examples': ["Blood tissue", "Bone tissue", "Cartilage"]
+        })
+
+    @Rule(Fact(query_topic='main_types_of_animal_tissues'),
+          Fact(tissue_type='muscle'))
+    def explain_muscle_detailed(self):
+        """Detailed explanation of muscle tissue."""
+        self.add_response({
+            'concept': 'Muscle Tissue (Detailed)',
+            'explanation': """Muscle tissue is made up of muscle cells or fibres capable of contraction and relaxation. Well-supplied with blood for oxygen and nutrient delivery.
+
+**Three Types:**
+
+1. **Smooth Muscle**
+   - Involuntary control
+   - Found in: Digestive tract, blood vessels, bladder
+
+2. **Skeletal Muscle**
+   - Voluntary control
+   - Found in: Arms, legs, face (attached to bones)
+
+3. **Cardiac Muscle**
+   - Involuntary control
+   - Found in: Heart only
+   - Rhythmic contraction""",
+            'topic': 'Biology',
+            'subtopic': 'Animal Tissues - Muscle',
+            'examples': ["Smooth muscle tissue", "Skeletal muscle tissue", "Cardiac muscle tissue"]
+        })
+
+    @Rule(Fact(query_topic='main_types_of_animal_tissues'),
+          Fact(tissue_type='nervous'))
+    def explain_nervous_detailed(self):
+        """Detailed explanation of nervous tissue."""
+        self.add_response({
+            'concept': 'Nervous Tissue (Detailed)',
+            'explanation': """Nervous tissue is found in chordate bodies, with the nerve cell or neuron serving as its structural unit. Specialized to transmit electrical impulses.
+
+**Key Features:**
+- Composed of neurons (nerve cells)
+- Highly specialized for signal transmission
+- Found in: Brain, spinal cord, nerves
+
+**Neuron Structure:**
+- Cell body (soma) - contains nucleus
+- Dendrites - receive signals
+- Axon - transmits signals away from cell body
+- Myelin sheath - insulates and speeds transmission""",
+            'topic': 'Biology',
+            'subtopic': 'Animal Tissues - Nervous',
+            'examples': ["Found in chordates", "Structural unit is the neuron", "Transmits impulses"]
+        })
 
     @Rule(Fact(query_topic='epithelial_tissue'))
     def rule_epithelial_tissue(self):
@@ -1179,12 +1612,220 @@ class BiologyExpert(KnowledgeEngine):
         """The process by which cells containing chlorophyll in green plants synthesize food (glucose) using light energy, carbondioxide, and water as raw materials."""
         self.add_response({
             'concept': 'Photosynthesis',
-            'explanation': """The process by which cells containing chlorophyll in green plants synthesize food (glucose) using light energy, carbondioxide, and water as raw materials.""",
+            'explanation': """Photosynthesis is the process by which green plants synthesize food (glucose) using light energy, carbon dioxide, and water.
+
+**Overall Equation:**
+6CO₂ + 6H₂O + Light Energy → C₆H₁₂O₆ (Glucose) + 6O₂
+
+**Key Requirements:**
+- **Light energy** (from sun)
+- **Chlorophyll** (green pigment in chloroplasts)
+- **Carbon dioxide** (from air via stomata)
+- **Water** (from soil via roots)
+
+**Products:**
+- Glucose (food/energy storage)
+- Oxygen (released to atmosphere)
+
+Would you like to learn more about a specific aspect of photosynthesis?""",
             'topic': 'Biology',
             'subtopic': 'Plant Biology',
             'examples': ["Green plants producing food", "Synthesis of glucose from CO2 and H2O", "Utilizing light energy by chlorophyll-containing cells"]
         })
-        # Multiple rules can fire
+        # Offer progressive questioning
+        self.clarification_question = """Which aspect of photosynthesis would you like to explore?
+
+1. **Light reactions** - Light-dependent stage (produces ATP & NADPH)
+2. **Dark reactions** - Light-independent stage (Calvin cycle, produces glucose)
+3. **Chloroplast structure** - Where photosynthesis occurs
+4. **Factors affecting** - Light intensity, CO₂, temperature, water
+
+Type: light, dark, chloroplast, or factors"""
+        self.needs_clarification = True
+
+    # PROGRESSIVE QUESTIONING - Photosynthesis Details
+    @Rule(Fact(query_topic='photosynthesis'),
+          Fact(photosynthesis_stage='light'))
+    def explain_light_reactions_detailed(self):
+        """Detailed explanation of light reactions in photosynthesis."""
+        self.add_response({
+            'concept': 'Light Reactions (Light-Dependent) - Detailed',
+            'explanation': """Light reactions are the first stage of photosynthesis that occur in the thylakoid membranes of chloroplasts. They require light and produce ATP and NADPH for the dark reactions.
+
+**Location:** Thylakoid membranes (grana) in chloroplasts
+
+**Process:**
+
+1. **Light Absorption**
+   - Chlorophyll absorbs light energy
+   - Electrons get excited to higher energy level
+
+2. **Photolysis of Water**
+   - Water molecule splits: 2H₂O → 4H⁺ + 4e⁻ + O₂
+   - Oxygen released as byproduct
+   - Electrons replace those lost by chlorophyll
+
+3. **Electron Transport Chain**
+   - High-energy electrons pass through carriers
+   - Energy used to pump H⁺ ions (creates gradient)
+   - ATP synthase produces ATP from ADP + Pi
+
+4. **NADPH Formation**
+   - Final electron acceptor: NADP⁺
+   - NADP⁺ + 2e⁻ + H⁺ → NADPH
+   - NADPH is electron carrier
+
+**Products:**
+- ATP (energy currency)
+- NADPH (reducing power)
+- O₂ (byproduct - released)
+
+**Summary:** Light + H₂O → ATP + NADPH + O₂""",
+            'topic': 'Biology',
+            'subtopic': 'Photosynthesis - Light Reactions',
+            'examples': ["Occurs in thylakoids", "Produces ATP and NADPH", "Releases oxygen"]
+        })
+
+    @Rule(Fact(query_topic='photosynthesis'),
+          Fact(photosynthesis_stage='dark'))
+    def explain_dark_reactions_detailed(self):
+        """Detailed explanation of dark reactions (Calvin cycle) in photosynthesis."""
+        self.add_response({
+            'concept': 'Dark Reactions (Calvin Cycle) - Detailed',
+            'explanation': """Dark reactions (Calvin cycle) are the second stage of photosynthesis that occur in the stroma of chloroplasts. They don't require light directly but use ATP and NADPH from light reactions to produce glucose.
+
+**Location:** Stroma (fluid) of chloroplasts
+
+**Process (Calvin Cycle - 3 Stages):**
+
+1. **Carbon Fixation**
+   - CO₂ combines with RuBP (5-carbon sugar)
+   - Enzyme: RuBisCO (most abundant protein on Earth)
+   - Forms: 2 × 3-carbon compounds (3-PGA)
+
+2. **Reduction Phase**
+   - ATP and NADPH (from light reactions) used
+   - 3-PGA → G3P (glyceraldehyde-3-phosphate)
+   - Energy from ATP, electrons from NADPH
+
+3. **Regeneration of RuBP**
+   - Most G3P recycled to regenerate RuBP
+   - 1 out of 6 G3P molecules exits cycle
+   - 2 G3P → 1 Glucose (C₆H₁₂O₆)
+
+**Requirements:**
+- CO₂ (from air)
+- ATP (from light reactions)
+- NADPH (from light reactions)
+- RuBP (acceptor molecule)
+
+**Products:**
+- Glucose (C₆H₁₂O₆)
+- ADP + Pi (returns to light reactions)
+- NADP⁺ (returns to light reactions)
+
+**Summary:** 3CO₂ + 6NADPH + 9ATP → G3P (sugar) + 6NADP⁺ + 9ADP""",
+            'topic': 'Biology',
+            'subtopic': 'Photosynthesis - Dark Reactions',
+            'examples': ["Occurs in stroma", "Calvin cycle", "Produces glucose"]
+        })
+
+    @Rule(Fact(query_topic='photosynthesis'),
+          Fact(photosynthesis_stage='chloroplast'))
+    def explain_chloroplast_structure_detailed(self):
+        """Detailed explanation of chloroplast structure."""
+        self.add_response({
+            'concept': 'Chloroplast Structure - Detailed',
+            'explanation': """Chloroplasts are the organelles where photosynthesis occurs in plant cells. They have a complex double-membrane structure optimized for capturing light energy and producing glucose.
+
+**Structure Components:**
+
+1. **Double Membrane**
+   - **Outer membrane** - Permeable, smooth
+   - **Inner membrane** - Less permeable, regulates transport
+   - **Intermembrane space** - Between outer and inner membranes
+
+2. **Stroma** (Fluid-filled interior)
+   - Contains: Enzymes for dark reactions (Calvin cycle)
+   - Has: DNA, ribosomes, starch granules
+   - pH: Slightly alkaline (~8)
+
+3. **Thylakoids** (Membrane-bound sacs)
+   - Disc-shaped structures
+   - Contain: Chlorophyll and photosystems
+   - Site of: Light reactions
+   - Stacked thylakoids = **Grana** (singular: granum)
+
+4. **Thylakoid Lumen** (Space inside thylakoid)
+   - H⁺ ion accumulation
+   - Creates proton gradient
+   - Drives ATP synthesis
+
+**Pigments:**
+- **Chlorophyll a** (primary) - Blue-green, absorbs red/blue light
+- **Chlorophyll b** (accessory) - Yellow-green
+- **Carotenoids** - Orange/yellow (protect, absorb different wavelengths)
+
+**Location of Stages:**
+- **Light reactions** → Thylakoid membranes
+- **Dark reactions** → Stroma
+
+**Why Green?**
+- Chlorophyll absorbs red and blue light
+- Reflects green light → appears green""",
+            'topic': 'Biology',
+            'subtopic': 'Chloroplast Structure',
+            'examples': ["Double membrane", "Thylakoids and grana", "Stroma"]
+        })
+
+    @Rule(Fact(query_topic='photosynthesis'),
+          Fact(photosynthesis_stage='factors'))
+    def explain_photosynthesis_factors_detailed(self):
+        """Detailed explanation of factors affecting photosynthesis."""
+        self.add_response({
+            'concept': 'Factors Affecting Photosynthesis - Detailed',
+            'explanation': """Photosynthesis rate is influenced by several environmental and internal factors. According to the **Law of Limiting Factors**, the rate is limited by the factor in shortest supply.
+
+**1. LIGHT INTENSITY**
+- Effect: Increases rate up to saturation point
+- Graph: Initially steep increase, then plateau
+- Why: More light → more light reactions → more ATP/NADPH
+- Too much: Can damage chloroplast (photo-inhibition)
+- Optimal: Full sunlight (~10,000-15,000 lux)
+
+**2. CARBON DIOXIDE CONCENTRATION**
+- Effect: Increases rate up to ~0.4%
+- Normal atmospheric: 0.04% (400 ppm)
+- Why: More CO₂ → more carbon fixation in Calvin cycle
+- Limiting factor: Often limits photosynthesis
+- Greenhouses: Often enriched to 0.1% for faster growth
+
+**3. TEMPERATURE**
+- Effect: Increases rate up to optimal (25-35°C)
+- Why: Enzymes work faster at higher temps
+- Too low (<5°C): Enzymes inactive
+- Too high (>40°C): Enzymes denature
+- Optimal: 25-35°C for most plants
+
+**4. WATER AVAILABILITY**
+- Effect: Essential for photolysis
+- Shortage: Stomata close (reduces CO₂ intake)
+- Wilting: Reduces leaf surface area
+- Critical: Severe shortage stops photosynthesis
+
+**5. CHLOROPHYLL CONTENT**
+- Effect: More chlorophyll → more light absorption
+- Factors: Mineral nutrients (Mg, N), plant health
+- Yellowing leaves: Less chlorophyll, reduced photosynthesis
+
+**Limiting Factor Concept:**
+- At any moment, ONE factor limits the rate
+- Example: Low CO₂ + high light → CO₂ is limiting
+- Increasing non-limiting factors has no effect""",
+            'topic': 'Biology',
+            'subtopic': 'Photosynthesis Factors',
+            'examples': ["Light intensity", "CO₂ concentration", "Temperature", "Water availability"]
+        })
 
     @Rule(Fact(query_topic='factors_necessary_for_photosynthesis'))
     def rule_factors_necessary_for_photosynthesis(self):
@@ -1755,12 +2396,209 @@ class BiologyExpert(KnowledgeEngine):
         """The process by which complex organic compounds are converted into simple organic products to be absorbed into the human body."""
         self.add_response({
             'concept': 'Digestion of food',
-            'explanation': """The process by which complex organic compounds are converted into simple organic products to be absorbed into the human body.""",
+            'explanation': """Digestion is the process by which complex organic compounds in food are converted into simple organic products that can be absorbed into the human body.
+
+**Two Main Types:**
+1. **Mechanical Digestion** - Physical breakdown (chewing, churning)
+2. **Chemical Digestion** - Enzymatic breakdown (changes chemical composition)
+
+**Purpose:**
+- Convert complex molecules → simple molecules
+- Make nutrients absorbable
+- Provide energy and building blocks for the body
+
+Would you like to learn more about a specific aspect of digestion?""",
             'topic': 'Biology',
             'subtopic': 'Food Digestion',
             'examples': ["Breaking down carbohydrates from bread into simple sugars.", "Converting proteins from meat into amino acids.", "Lipids from oils being broken down into fatty acids and glycerol."]
         })
-        # Multiple rules can fire
+        # Offer progressive questioning
+        self.clarification_question = """Which aspect of digestion would you like to explore?
+
+1. **Mechanical digestion** - Physical breakdown (chewing, grinding, mixing)
+2. **Chemical digestion** - Enzymatic breakdown (enzymes, chemical changes)
+3. **Digestive organs** - Mouth, stomach, intestines, liver, pancreas
+4. **Digestive enzymes** - Types and functions
+
+Type: mechanical, chemical, organs, or enzymes"""
+        self.needs_clarification = True
+
+    # PROGRESSIVE QUESTIONING - Digestion Details
+    @Rule(Fact(query_topic='digestion_of_food'),
+          Fact(digestion_type='mechanical'))
+    def explain_mechanical_digestion_detailed(self):
+        """Detailed explanation of mechanical digestion."""
+        self.add_response({
+            'concept': 'Mechanical Digestion (Detailed)',
+            'explanation': """Mechanical digestion is the PHYSICAL breakdown of food without changing its chemical composition. It increases surface area for enzyme action.
+
+**Process by Location:**
+
+1. **Mouth**
+   - Teeth: Cutting (incisors), tearing (canines), grinding (molars)
+   - Tongue: Mixing food with saliva, forming bolus
+   - Result: Food broken into smaller pieces
+
+2. **Stomach**
+   - Churning: Strong muscular contractions
+   - Mixing: Food + gastric juice → chyme (semi-liquid)
+   - Duration: 2-6 hours
+   - Result: Liquefied food mixture
+
+3. **Small Intestine**
+   - Segmentation: Mixing contractions
+   - Peristalsis: Wave-like movements push food forward
+   - Result: Thorough mixing with digestive juices
+
+**Purpose:**
+- Increase surface area for enzymes
+- Mix food with digestive juices
+- Move food through digestive tract
+- Does NOT change chemical structure""",
+            'topic': 'Biology',
+            'subtopic': 'Food Digestion - Mechanical',
+            'examples': ["Chewing with teeth", "Churning in stomach", "Segmentation in intestines"]
+        })
+
+    @Rule(Fact(query_topic='digestion_of_food'),
+          Fact(digestion_type='chemical'))
+    def explain_chemical_digestion_detailed(self):
+        """Detailed explanation of chemical digestion."""
+        self.add_response({
+            'concept': 'Chemical Digestion (Detailed)',
+            'explanation': """Chemical digestion is the breakdown of complex molecules into simple, absorbable molecules using ENZYMES. This CHANGES the chemical composition.
+
+**Process by Food Type:**
+
+1. **Carbohydrate Digestion**
+   - Mouth: Starch → Maltose (salivary amylase/ptyalin)
+   - Small intestine: Maltose → Glucose (maltase)
+   - Final product: Glucose (simple sugar)
+
+2. **Protein Digestion**
+   - Stomach: Protein → Polypeptides (pepsin + HCl)
+   - Small intestine: Polypeptides → Peptides (trypsin, chymotrypsin)
+   - Small intestine: Peptides → Amino acids (peptidases)
+   - Final product: Amino acids
+
+3. **Lipid (Fat) Digestion**
+   - Liver: Produces bile (emulsifies fats - breaks into droplets)
+   - Small intestine: Fats → Fatty acids + Glycerol (lipase)
+   - Final product: Fatty acids and glycerol
+
+**Key Enzymes:**
+- Amylase - breaks down starch
+- Pepsin - breaks down proteins (stomach)
+- Trypsin - breaks down proteins (small intestine)
+- Lipase - breaks down fats""",
+            'topic': 'Biology',
+            'subtopic': 'Food Digestion - Chemical',
+            'examples': ["Starch → Maltose → Glucose", "Protein → Amino acids", "Fat → Fatty acids + Glycerol"]
+        })
+
+    @Rule(Fact(query_topic='digestion_of_food'),
+          Fact(digestion_type='organs'))
+    def explain_digestive_organs_detailed(self):
+        """Detailed explanation of digestive organs."""
+        self.add_response({
+            'concept': 'Digestive System Organs (Detailed)',
+            'explanation': """The digestive system consists of the digestive tract (alimentary canal) and accessory organs.
+
+**Digestive Tract (Food Path):**
+
+1. **Mouth** (Oral cavity)
+   - Teeth: Mechanical breakdown
+   - Tongue: Taste, mixing, swallowing
+   - Salivary glands: Produce saliva (amylase enzyme)
+
+2. **Pharynx** (Throat)
+   - Passageway for food and air
+   - Epiglottis: Prevents food entering trachea
+
+3. **Esophagus** (Food pipe)
+   - Muscular tube (~25cm)
+   - Peristalsis moves food to stomach
+
+4. **Stomach**
+   - J-shaped muscular organ
+   - Stores food (2-6 hours)
+   - Gastric juice: HCl + pepsin
+   - Churning: Mechanical + chemical digestion
+
+5. **Small Intestine** (~6m long)
+   - Duodenum: Receives bile & pancreatic juice
+   - Jejunum & Ileum: Absorption
+   - MOST digestion and absorption occurs here
+
+6. **Large Intestine** (~1.5m)
+   - Absorbs water
+   - Forms feces
+   - Bacterial fermentation
+
+7. **Rectum & Anus**
+   - Storage and elimination of feces
+
+**Accessory Organs:**
+- **Liver**: Produces bile (emulsifies fats)
+- **Gallbladder**: Stores bile
+- **Pancreas**: Produces digestive enzymes + bicarbonate""",
+            'topic': 'Biology',
+            'subtopic': 'Digestive System',
+            'examples': ["Mouth", "Stomach", "Small intestine", "Liver", "Pancreas"]
+        })
+
+    @Rule(Fact(query_topic='digestion_of_food'),
+          Fact(digestion_type='enzymes'))
+    def explain_digestive_enzymes_detailed(self):
+        """Detailed explanation of digestive enzymes."""
+        self.add_response({
+            'concept': 'Digestive Enzymes (Detailed)',
+            'explanation': """Digestive enzymes are biological catalysts that speed up the breakdown of complex food molecules into simple, absorbable units.
+
+**Major Digestive Enzymes:**
+
+1. **CARBOHYDRASE ENZYMES** (Break down carbohydrates)
+   - **Salivary Amylase** (Mouth)
+     * Source: Salivary glands
+     * Action: Starch → Maltose
+     * pH: 6.8 (neutral)
+   
+   - **Maltase** (Small intestine)
+     * Source: Intestinal glands
+     * Action: Maltose → Glucose
+     * pH: 7-8 (slightly alkaline)
+
+2. **PROTEASE ENZYMES** (Break down proteins)
+   - **Pepsin** (Stomach)
+     * Source: Gastric glands
+     * Action: Protein → Polypeptides
+     * pH: 1.5-2 (very acidic)
+   
+   - **Trypsin** (Small intestine)
+     * Source: Pancreas
+     * Action: Polypeptides → Peptides
+     * pH: 7-8 (alkaline)
+   
+   - **Peptidases** (Small intestine)
+     * Source: Intestinal glands
+     * Action: Peptides → Amino acids
+
+3. **LIPASE ENZYMES** (Break down fats)
+   - **Lipase** (Small intestine)
+     * Source: Pancreas
+     * Action: Fats → Fatty acids + Glycerol
+     * Requires: Bile for emulsification
+     * pH: 7-8
+
+**Enzyme Properties:**
+- Specific substrate (one enzyme, one substrate type)
+- pH dependent (work at optimal pH)
+- Temperature sensitive (37°C optimal)
+- Reusable (not consumed in reaction)""",
+            'topic': 'Biology',
+            'subtopic': 'Digestive Enzymes',
+            'examples': ["Amylase - breaks starch", "Pepsin - breaks protein", "Lipase - breaks fats"]
+        })
 
     @Rule(Fact(query_topic='mechanical_process__digestion_'))
     def rule_mechanical_process__digestion_(self):
@@ -2259,12 +3097,142 @@ class BiologyExpert(KnowledgeEngine):
         """A fundamental biological process involving gas exchange. In humans, it is a complex process that occurs in three main stages: gas exchange between the external environment and lungs, gas exchange in alveoli, and cellular respiration."""
         self.add_response({
             'concept': 'Respiration',
-            'explanation': """A fundamental biological process involving gas exchange. In humans, it is a complex process that occurs in three main stages: gas exchange between the external environment and lungs, gas exchange in alveoli, and cellular respiration.""",
+            'explanation': """A fundamental biological process involving gas exchange. In humans, it is a complex process that occurs in three main stages:
+
+1. **Gas exchange between external environment and lungs**
+2. **Gas exchange in alveoli** (oxygen into blood, CO₂ out)
+3. **Cellular respiration** (energy production in cells)
+
+Would you like to learn more about a specific aspect of respiration?""",
             'topic': 'Biology',
             'subtopic': 'Human Physiology',
             'examples': ["Gas exchange can be observed in some animals externally.", "Gas exchange between external environment and lungs", "Cellular respiration"]
         })
-        # Multiple rules can fire
+        # Offer progressive questioning
+        self.clarification_question = """Which aspect of respiration would you like to explore?
+
+1. **Aerobic respiration** - With oxygen
+2. **Anaerobic respiration** - Without oxygen
+3. **Respiratory system** - Organs and structure
+4. **Cellular respiration** - ATP production
+
+Type: aerobic, anaerobic, system, or cellular"""
+        self.needs_clarification = True
+
+    # PROGRESSIVE QUESTIONING - Respiration Details
+    @Rule(Fact(query_topic='respiration'),
+          Fact(respiration_type='aerobic'))
+    def explain_aerobic_respiration_detailed(self):
+        """Detailed explanation of aerobic respiration."""
+        self.add_response({
+            'concept': 'Aerobic Respiration (Detailed)',
+            'explanation': """Aerobic respiration is the process of breaking down glucose in the presence of oxygen to produce energy (ATP), water, and carbon dioxide.
+
+**Process:**
+- Occurs in: Cytoplasm and mitochondria
+- Equation: C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + Energy (38 ATP)
+
+**Stages:**
+1. **Glycolysis** (Cytoplasm) - Glucose → 2 Pyruvate + 2 ATP
+2. **Krebs Cycle** (Mitochondria) - Pyruvate breakdown + 2 ATP
+3. **Electron Transport Chain** (Mitochondria) - 34 ATP produced
+
+**Characteristics:**
+- High energy yield (38 ATP per glucose)
+- Complete glucose breakdown
+- Requires oxygen""",
+            'topic': 'Biology',
+            'subtopic': 'Cellular Respiration',
+            'examples': ["Occurs in mitochondria", "Produces 38 ATP", "Requires oxygen"]
+        })
+
+    @Rule(Fact(query_topic='respiration'),
+          Fact(respiration_type='anaerobic'))
+    def explain_anaerobic_respiration_detailed(self):
+        """Detailed explanation of anaerobic respiration."""
+        self.add_response({
+            'concept': 'Anaerobic Respiration (Detailed)',
+            'explanation': """Anaerobic respiration is the breakdown of glucose WITHOUT oxygen to produce energy. It yields much less ATP than aerobic respiration.
+
+**Two Types:**
+
+1. **Lactic Acid Fermentation** (Animals/Muscles)
+   - Glucose → 2 Lactic Acid + 2 ATP
+   - Occurs during: Intense exercise when oxygen is limited
+   - Causes: Muscle fatigue and soreness
+   
+2. **Alcoholic Fermentation** (Yeast/Bacteria)
+   - Glucose → 2 Ethanol + 2 CO₂ + 2 ATP
+   - Used in: Brewing, baking
+
+**Characteristics:**
+- Low energy yield (2 ATP per glucose)
+- Incomplete glucose breakdown
+- Does NOT require oxygen""",
+            'topic': 'Biology',
+            'subtopic': 'Cellular Respiration',
+            'examples': ["Lactic acid fermentation", "Alcoholic fermentation", "Produces only 2 ATP"]
+        })
+
+    @Rule(Fact(query_topic='respiration'),
+          Fact(respiration_type='system'))
+    def explain_respiratory_system_detailed(self):
+        """Detailed explanation of respiratory system."""
+        self.add_response({
+            'concept': 'Respiratory System (Detailed)',
+            'explanation': """The respiratory system facilitates gas exchange - bringing oxygen into the body and removing carbon dioxide.
+
+**Main Parts:**
+1. **Nasal Cavity** - Filters, warms, moistens air
+2. **Pharynx** - Throat passage
+3. **Larynx** - Voice box
+4. **Trachea** - Windpipe (with cartilage rings)
+5. **Bronchi** - Two tubes branching into lungs
+6. **Bronchioles** - Smaller air passages
+7. **Alveoli** - Tiny air sacs (gas exchange site)
+
+**Gas Exchange in Alveoli:**
+- Oxygen diffuses from alveoli → blood
+- CO₂ diffuses from blood → alveoli
+- Surrounded by capillaries (thin walls)
+- Large surface area for efficient exchange""",
+            'topic': 'Biology',
+            'subtopic': 'Respiratory System',
+            'examples': ["Nasal cavity", "Trachea", "Alveoli"]
+        })
+
+    @Rule(Fact(query_topic='respiration'),
+          Fact(respiration_type='cellular'))
+    def explain_cellular_respiration_detailed(self):
+        """Detailed explanation of cellular respiration."""
+        self.add_response({
+            'concept': 'Cellular Respiration (Detailed)',
+            'explanation': """Cellular respiration is the process by which cells break down glucose to produce ATP (energy currency of cells).
+
+**Location:** Primarily in mitochondria
+
+**Three Stages:**
+
+1. **Glycolysis** (Cytoplasm)
+   - 1 Glucose → 2 Pyruvate
+   - Net gain: 2 ATP
+   - Does NOT require oxygen
+
+2. **Krebs Cycle / Citric Acid Cycle** (Mitochondrial matrix)
+   - Pyruvate breakdown
+   - Produces: 2 ATP + NADH + FADH₂
+   - Releases CO₂
+
+3. **Electron Transport Chain** (Inner mitochondrial membrane)
+   - Uses NADH and FADH₂
+   - Produces: ~34 ATP
+   - Requires oxygen (final electron acceptor)
+
+**Total ATP yield:** ~38 ATP per glucose molecule""",
+            'topic': 'Biology',
+            'subtopic': 'Cellular Respiration',
+            'examples': ["Glycolysis", "Krebs cycle", "Electron transport chain"]
+        })
 
     @Rule(Fact(query_topic='external_gas_exchange__human_respiration_'))
     def rule_external_gas_exchange__human_respiration_(self):
@@ -2919,12 +3887,174 @@ class BiologyExpert(KnowledgeEngine):
         """When blood is centrifuged and allowed to settle, it separates into two distinct layers. The upper layer, making up approximately 55% of the blood volume, is the plasma (a pale yellow fluid). The lower, dark red layer, constituting about 45%, consists of blood corpuscles."""
         self.add_response({
             'concept': 'Blood Components (Centrifugation)',
-            'explanation': """When blood is centrifuged and allowed to settle, it separates into two distinct layers. The upper layer, making up approximately 55% of the blood volume, is the plasma (a pale yellow fluid). The lower, dark red layer, constituting about 45%, consists of blood corpuscles.""",
+            'explanation': """When blood is centrifuged, it separates into two main components:
+
+1. **Plasma** (55%) - Pale yellow fluid
+   - Contains water, proteins, nutrients, hormones
+   
+2. **Blood Corpuscles** (45%) - Dark red layer
+   - Red blood cells (RBCs)
+   - White blood cells (WBCs)
+   - Platelets
+
+Would you like to learn more about a specific blood component?""",
             'topic': 'Biology',
             'subtopic': 'Blood Composition',
             'examples': ["Plasma (55%, pale yellow fluid)", "Corpuscles (45%, dark red materials)", "Separation into two layers upon centrifugation"]
         })
-        # Multiple rules can fire
+        # Offer progressive questioning
+        self.clarification_question = """Which blood component would you like to explore in detail?
+
+1. **Red Blood Cells (RBCs)** - Oxygen transport
+2. **White Blood Cells (WBCs)** - Immune defense
+3. **Platelets** - Blood clotting
+4. **Plasma** - Liquid component
+
+Type: rbc, wbc, platelets, or plasma"""
+        self.needs_clarification = True
+
+    # PROGRESSIVE QUESTIONING - Blood Components Details
+    @Rule(Fact(query_topic='blood_components__centrifugation_'),
+          Fact(blood_component='rbc'))
+    def explain_rbc_detailed(self):
+        """Detailed explanation of red blood cells."""
+        self.add_response({
+            'concept': 'Red Blood Cells (RBCs) - Detailed',
+            'explanation': """Red Blood Cells (Erythrocytes) are the most abundant cells in blood, specialized for oxygen transport.
+
+**Structure:**
+- Biconcave disc shape (increases surface area)
+- No nucleus (more space for hemoglobin)
+- Flexible membrane (can squeeze through capillaries)
+
+**Composition:**
+- Contains hemoglobin (iron-containing protein)
+- Red color from hemoglobin
+
+**Numbers & Lifespan:**
+- ~5 million per cubic millimeter of blood
+- Lifespan: 120 days (4 months)
+- Produced in: Red bone marrow
+- Destroyed in: Liver and spleen
+
+**Function:**
+- Transport oxygen from lungs to tissues
+- Transport some CO₂ from tissues to lungs
+- Hemoglobin + O₂ → Oxyhemoglobin (bright red)""",
+            'topic': 'Biology',
+            'subtopic': 'Blood Cells',
+            'examples': ["Biconcave disc shape", "5 million per cubic mm", "Lifespan 120 days"]
+        })
+
+    @Rule(Fact(query_topic='blood_components__centrifugation_'),
+          Fact(blood_component='wbc'))
+    def explain_wbc_detailed(self):
+        """Detailed explanation of white blood cells."""
+        self.add_response({
+            'concept': 'White Blood Cells (WBCs) - Detailed',
+            'explanation': """White Blood Cells (Leukocytes) are the immune system's primary defense against infections and diseases.
+
+**Characteristics:**
+- Have nuclei (unlike RBCs)
+- Colorless (no hemoglobin)
+- Larger than RBCs but fewer in number
+- Ratio RBC:WBC = 600:1
+- ~7,000-10,000 per cubic mm
+
+**Types:**
+
+1. **Granulocytes** (with granules)
+   - Neutrophils (60-70%) - Phagocytosis of bacteria
+   - Eosinophils (2-4%) - Fight parasites, allergies
+   - Basophils (0.5-1%) - Release histamine
+
+2. **Non-granulocytes** (no granules)
+   - Lymphocytes (20-25%) - Antibody production (B-cells), cell-mediated immunity (T-cells)
+   - Monocytes (3-8%) - Phagocytosis, become macrophages
+
+**Functions:**
+- Fight infections and diseases
+- Produce antibodies
+- Destroy pathogens
+- Remove dead cells""",
+            'topic': 'Biology',
+            'subtopic': 'Blood Cells',
+            'examples': ["Neutrophils", "Lymphocytes", "Monocytes"]
+        })
+
+    @Rule(Fact(query_topic='blood_components__centrifugation_'),
+          Fact(blood_component='platelets'))
+    def explain_platelets_detailed(self):
+        """Detailed explanation of platelets."""
+        self.add_response({
+            'concept': 'Platelets (Thrombocytes) - Detailed',
+            'explanation': """Platelets are small, colorless cell fragments essential for blood clotting and wound healing.
+
+**Characteristics:**
+- Not complete cells - fragments of megakaryocytes
+- No nucleus
+- Smallest blood component
+- ~250,000-400,000 per cubic mm
+- Lifespan: 8-10 days
+- Produced in: Bone marrow
+
+**Function - Blood Clotting:**
+
+1. **Injury occurs** → Blood vessel damaged
+2. **Platelet activation** → Platelets stick to wound site
+3. **Platelet aggregation** → Form platelet plug
+4. **Coagulation cascade** → Fibrin forms mesh
+5. **Clot formation** → Stops bleeding
+
+**Clotting Factors:**
+- Vitamin K required
+- Calcium ions needed
+- Prothrombin → Thrombin
+- Fibrinogen → Fibrin (mesh)
+
+**Disorders:**
+- Thrombocytopenia (low count) → Excessive bleeding
+- Thrombocytosis (high count) → Blood clots""",
+            'topic': 'Biology',
+            'subtopic': 'Blood Cells',
+            'examples': ["Blood clotting", "Platelet plug formation", "250,000-400,000 per cubic mm"]
+        })
+
+    @Rule(Fact(query_topic='blood_components__centrifugation_'),
+          Fact(blood_component='plasma'))
+    def explain_plasma_detailed(self):
+        """Detailed explanation of blood plasma."""
+        self.add_response({
+            'concept': 'Blood Plasma - Detailed',
+            'explanation': """Plasma is the liquid component of blood, making up 55% of total blood volume. It's a pale yellow fluid that transports blood cells and various substances throughout the body.
+
+**Composition:**
+- **Water** (~90%) - Solvent
+- **Proteins** (~7%)
+  * Albumin - Maintains osmotic pressure
+  * Globulins - Antibodies (immune function)
+  * Fibrinogen - Blood clotting
+- **Nutrients** - Glucose, amino acids, lipids
+- **Hormones** - Chemical messengers
+- **Waste products** - Urea, creatinine, CO₂
+- **Electrolytes** - Na⁺, K⁺, Ca²⁺, Cl⁻
+- **Gases** - O₂, CO₂
+
+**Functions:**
+1. **Transport** - Nutrients, hormones, waste
+2. **Osmotic balance** - Fluid distribution
+3. **pH buffering** - Maintains blood pH
+4. **Temperature regulation** - Heat distribution
+5. **Immune function** - Antibodies (immunoglobulins)
+6. **Blood clotting** - Contains clotting factors
+
+**Plasma vs Serum:**
+- Plasma = Blood - Cells (contains clotting factors)
+- Serum = Plasma - Clotting factors""",
+            'topic': 'Biology',
+            'subtopic': 'Blood Composition',
+            'examples': ["90% water", "Contains proteins", "Transports nutrients"]
+        })
 
     @Rule(Fact(query_topic='types_of_blood_corpuscles'))
     def rule_types_of_blood_corpuscles(self):
