@@ -334,7 +334,7 @@ def subject_tutor_tab(agent):
     # Main content area
     st.markdown("---")
     
-    # Display chat history
+    # Display chat history FIRST
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             if message["role"] == "assistant":
@@ -342,11 +342,9 @@ def subject_tutor_tab(agent):
             else:
                 st.markdown(message["content"])
     
-    # Chat input
+    # Chat input at the END (this keeps it at bottom)
     if prompt := st.chat_input("Ask me anything about O/L subjects..."):
-        # Display user message
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
         
         # Debug: Show current state
@@ -354,100 +352,76 @@ def subject_tutor_tab(agent):
         print(f"   Awaiting clarification: {st.session_state.awaiting_clarification}")
         print(f"   Clarification tool: {st.session_state.clarification_tool}")
         
-        # Process query
-        with st.chat_message("assistant"):
-            with st.spinner("🤔 Thinking..."):
-                # Check if we're responding to a clarification question
-                if st.session_state.awaiting_clarification:
-                    print(f"   → Handling as clarification response")
-                    # Handle clarification response for study guide
-                    if st.session_state.clarification_tool == 'study_guide_expert':
-                        expert = agent.tools['study_guide_expert']
-                        
-                        # Use the built-in method to declare user's response
-                        expert.declare_user_response(prompt)
-                        
-                        # Run the expert system
-                        expert.run()
-                        
-                        # Check if still needs clarification or diagnosis complete
-                        if expert.requires_clarification():
-                            result = {
-                                'response': expert.get_clarification_question(),
-                                'tool_used': 'study_guide_expert',
-                                'needs_clarification': True,
-                                'success': True
-                            }
-                            # Keep awaiting_clarification True for next response
-                            st.session_state.awaiting_clarification = True
-                            st.session_state.clarification_tool = 'study_guide_expert'
-                            print(f"   → Still needs clarification (keeping state)")
-                        elif expert.is_diagnosis_complete():
-                            result = {
-                                'response': expert.get_response(),
-                                'tool_used': 'study_guide_expert',
-                                'needs_clarification': False,
-                                'success': True
-                            }
-                            # Clear clarification state - diagnosis complete
-                            st.session_state.awaiting_clarification = False
-                            st.session_state.clarification_tool = None
-                            print(f"   → Diagnosis complete! (clearing state)")
-                        else:
-                            result = {
-                                'response': "Let me help you with that...",
-                                'tool_used': 'study_guide_expert',
-                                'needs_clarification': False,
-                                'success': False
-                            }
-                            # Clear clarification state - something went wrong
-                            st.session_state.awaiting_clarification = False
-                            st.session_state.clarification_tool = None
-                            print(f"   → Unknown state (clearing state)")
-                    else:
-                        # Other clarification handlers can go here
-                        result = agent.process_query(prompt)
+        # Process query with spinner
+        with st.spinner("🤔 Thinking..."):
+            # Check if we're responding to a clarification question
+            if st.session_state.awaiting_clarification:
+                print(f"   → Handling as clarification response")
+                # Handle clarification response for study guide
+                if st.session_state.clarification_tool == 'study_guide_expert':
+                    expert = agent.tools['study_guide_expert']
+                    
+                    # Use the built-in method to declare user's response
+                    expert.declare_user_response(prompt)
+                    
+                    # Run the expert system
+                    expert.run()
+                    
+                    # Check if still needs clarification or diagnosis complete
+                    if expert.requires_clarification():
+                        result = {
+                            'response': expert.get_clarification_question(),
+                            'tool_used': 'study_guide_expert',
+                            'needs_clarification': True,
+                            'success': True
+                        }
+                        # Keep awaiting_clarification True for next response
+                        st.session_state.awaiting_clarification = True
+                        st.session_state.clarification_tool = 'study_guide_expert'
+                        print(f"   → Still needs clarification (keeping state)")
+                    elif expert.is_diagnosis_complete():
+                        result = {
+                            'response': expert.get_response(),
+                            'tool_used': 'study_guide_expert',
+                            'needs_clarification': False,
+                            'success': True
+                        }
+                        # Clear clarification state - diagnosis complete
                         st.session_state.awaiting_clarification = False
                         st.session_state.clarification_tool = None
+                        print(f"   → Diagnosis complete! (clearing state)")
+                    else:
+                        result = {
+                            'response': "Let me help you with that...",
+                            'tool_used': 'study_guide_expert',
+                            'needs_clarification': False,
+                            'success': False
+                        }
+                        # Clear clarification state - something went wrong
+                        st.session_state.awaiting_clarification = False
+                        st.session_state.clarification_tool = None
+                        print(f"   → Unknown state (clearing state)")
                 else:
-                    print(f"   → Handling as new query")
-                    # Normal query processing
+                    # Other clarification handlers can go here
                     result = agent.process_query(prompt)
-                    
-                    # Check if result needs clarification
-                    if result.get('needs_clarification'):
-                        st.session_state.awaiting_clarification = True
-                        st.session_state.clarification_tool = result.get('tool_used')
-                        print(f"   → Set awaiting_clarification=True for {result.get('tool_used')}")
+                    st.session_state.awaiting_clarification = False
+                    st.session_state.clarification_tool = None
+            else:
+                print(f"   → Handling as new query")
+                # Normal query processing
+                result = agent.process_query(prompt)
                 
-                display_response(result)
-                st.session_state.messages.append({"role": "assistant", "content": result})
-    
-    # Examples to try
-    st.markdown("---")
-    st.markdown("### 💭 Example Questions")
-    
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        if st.button("What is photosynthesis?"):
-            st.session_state.messages.append({"role": "user", "content": "What is photosynthesis?"})
-            st.rerun()
-    
-    with col2:
-        if st.button("Explain forces"):
-            st.session_state.messages.append({"role": "user", "content": "Explain forces"})
-            st.rerun()
-    
-    with col3:
-        if st.button("Acids and bases"):
-            st.session_state.messages.append({"role": "user", "content": "Acids and bases"})
-            st.rerun()
-    
-    with col4:
-        if st.button("Cell division"):
-            st.session_state.messages.append({"role": "user", "content": "Cell division"})
-            st.rerun()
+                # Check if result needs clarification
+                if result.get('needs_clarification'):
+                    st.session_state.awaiting_clarification = True
+                    st.session_state.clarification_tool = result.get('tool_used')
+                    print(f"   → Set awaiting_clarification=True for {result.get('tool_used')}")
+            
+            # Add assistant response to chat history
+            st.session_state.messages.append({"role": "assistant", "content": result})
+        
+        # Rerun to display the new messages
+        st.rerun()
 
 def study_guide_tab():
     """Comprehensive study guide and wellness tab."""
@@ -456,7 +430,6 @@ def study_guide_tab():
     # Initialize study guide expert in session state
     if 'study_guide_expert' not in st.session_state:
         st.session_state.study_guide_expert = StudyGuideExpert()
-        st.session_state.study_guide_expert.reset()
     
     study_expert = st.session_state.study_guide_expert
     
@@ -515,138 +488,230 @@ def study_guide_tab():
     - ⏰ Time management and productivity
     - 🎯 Exam preparation and test-taking strategies
     
-    Just ask me anything about studying, stress, motivation, or exam preparation!
+    **NEW: Multi-Input Analysis** - Provide detailed information for highly personalized recommendations!
     """)
     
     st.markdown("---")
     
-    # ====== Selection-based Study Guide UI (traditional expert system style) ======
-    st.markdown("### Choose a topic and a specific question")
-
-    CATEGORIES = {
-        'Study Techniques': [
-            'How can I improve my memory?',
-            'What are active learning methods?',
-            'How do I make effective notes?'
-        ],
-        'Wellness': [
-            "I feel anxious about exams",
-            "I'm feeling overwhelmed with studies",
-            "I can't sleep well during exam time"
-        ],
-        'Motivation': [
-            "I keep procrastinating",
-            "I've lost my motivation to study",
-            'How to build study confidence'
-        ],
-        'Time Management': [
-            'Help me manage my study time',
-            'Create a study schedule',
-            'How to prioritise topics before exams'
-        ],
-        'Exam Preparation': [
-            'How to prepare for exam next week',
-            'What to do the night before an exam',
-            'Last-minute cramming strategies'
-        ],
-        'Memory': [
-            'How can I improve my memory?',
-            'What is spaced repetition?',
-            'How to use the memory palace?'
-        ],
-        'Confidence': [
-            'I feel I am not smart',
-            'How to build confidence for exams',
-            'What to do after a bad test result'
-        ]
-    }
-
-    category = st.selectbox("Category", list(CATEGORIES.keys()))
-    question = st.selectbox("Question", CATEGORIES[category])
-
-    # Shortcut buttons (map into selection + run)
-    cols = st.columns(3)
-    if cols[0].button("Exam anxiety"):
-        category = 'Wellness'
-        question = "I feel anxious about exams"
-    if cols[1].button("Procrastination"):
-        category = 'Motivation'
-        question = "I keep procrastinating"
-    if cols[2].button("Memory tips"):
-        category = 'Memory'
-        question = "How can I improve my memory?"
-
+    # ====== ENHANCED Multi-Input Study Guide UI ======
+    st.markdown("### 📊 Personalized Study Analysis")
+    st.markdown("*Fill in as many fields as you can for better recommendations*")
+    
+    # Create two columns for inputs
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("#### 📝 Basic Information")
+        
+        # Category selection
+        CATEGORIES = {
+            'Memory': 'Memory & Retention',
+            'Focus': 'Focus & Concentration',
+            'Stress': 'Stress Management',
+            'Time Management': 'Time Management',
+            'Sleep': 'Sleep & Recovery',
+            'Motivation': 'Motivation & Psychology',
+            'Exam Preparation': 'Exam Strategies',
+            'Confidence': 'Confidence Building'
+        }
+        
+        category = st.selectbox("🎯 What area do you need help with?", list(CATEGORIES.keys()), 
+                                format_func=lambda x: CATEGORIES[x])
+        
+        # Text question
+        question = st.text_area("❓ Describe your specific concern or question:", 
+                                placeholder="e.g., I struggle to remember what I studied yesterday...",
+                                height=100)
+        
+        # Learning style
+        learning_style = st.selectbox("🎨 What's your preferred learning style?",
+                                      ["Not sure", "Visual", "Auditory", "Kinesthetic", "Reading/Writing"])
+        learning_style = None if learning_style == "Not sure" else learning_style.replace("/", " ")
+    
+    with col2:
+        st.markdown("#### 📈 Quantitative Inputs")
+        
+        # Numeric inputs
+        study_hours = st.slider("📚 Study hours per day:", 0, 12, 4, 
+                                help="How many hours do you typically study each day?")
+        
+        stress_level = st.slider("😰 Current stress level (1-10):", 1, 10, 5,
+                                 help="1 = Very relaxed, 10 = Extremely stressed")
+        
+        sleep_hours = st.slider("😴 Sleep hours per night:", 3, 12, 7,
+                                help="How many hours of sleep do you get on average?")
+        
+        # Boolean input
+        has_upcoming_exam = st.checkbox("📅 I have an exam coming up soon (within 2 weeks)")
+        
+        # Visual indicators
+        st.markdown("---")
+        if stress_level >= 8:
+            st.warning("⚠️ High stress detected!")
+        if sleep_hours < 6:
+            st.warning("⚠️ Sleep deprivation alert!")
+        if study_hours >= 8 and stress_level >= 7:
+            st.error("🚨 Burnout risk detected!")
+    
+    st.markdown("---")
+    
+    # Quick preset buttons
+    st.markdown("**Quick Scenarios:**")
+    preset_cols = st.columns(4)
+    
+    preset_clicked = None
+    if preset_cols[0].button("😰 High Stress", use_container_width=True):
+        preset_clicked = "stress"
+    if preset_cols[1].button("😴 Sleep Issues", use_container_width=True):
+        preset_clicked = "sleep"
+    if preset_cols[2].button("📚 Exam Prep", use_container_width=True):
+        preset_clicked = "exam"
+    if preset_cols[3].button("🎯 Focus Problems", use_container_width=True):
+        preset_clicked = "focus"
+    
+    # Apply presets
+    if preset_clicked == "stress":
+        category, stress_level, study_hours = "Stress", 9, 5
+        question = "I feel overwhelmed and anxious about my studies"
+    elif preset_clicked == "sleep":
+        category, sleep_hours, stress_level = "Sleep", 5, 7
+        question = "I'm not getting enough sleep and it's affecting my memory"
+    elif preset_clicked == "exam":
+        category, has_upcoming_exam, stress_level = "Exam Preparation", True, 8
+        question = "I have an exam next week and I'm not prepared"
+    elif preset_clicked == "focus":
+        category, stress_level, study_hours = "Focus", 6, 3
+        question = "I can't concentrate when I study"
+    
     st.markdown("---")
 
-    if st.button("Get Advice"):
-        with st.spinner("🤔 Consulting the study guide..."):
-            # Debug: Show what's happening
-            print("\n" + "="*60)
-            print("🔍 [DEBUG] Study Guide Expert Called")
-            print(f"   Category: {category}")
-            print(f"   Question: {question}")
-            print(f"   Lowercased: {question.lower()}")
-            
-            # Test pattern matching directly
-            test_query = question.lower()
-            print(f"   Testing patterns:")
-            print(f"      'anxious' in query: {'anxious' in test_query}")
-            print(f"      'feel anxious' in query: {'feel anxious' in test_query}")
-            print(f"      'stress' in query: {'stress' in test_query}")
-            print("="*60)
-            
-            # Reset expert and run with mapped query string
-            study_expert.reset()
-            from experta import Fact
-            study_expert.declare(Fact(user_query=question.lower()))
-            
-            print("   Running expert engine...")
-            study_expert.run()
-            
-            response = study_expert.get_response()
-            print(f"   Response received: {response is not None}")
-            print("="*60 + "\n")
-            
-            if response:
-                display_study_guide_response(response)
-            else:
-                fallback = {
-                    'concept': 'Study Guidance',
-                    'explanation': """I couldn't find a specific match for that selection. Try a related question or select another topic.""",
-                    'topic': 'Study Guide'
-                }
-                display_study_guide_response(fallback)
+    # Get Advice button
+    if st.button("🔍 Get Personalized Advice", type="primary", use_container_width=True):
+        if not question or len(question.strip()) < 10:
+            st.warning("⚠️ Please provide a more detailed question (at least 10 characters)")
+        else:
+            with st.spinner("🤔 Analyzing your situation with advanced rule-based reasoning..."):
+                # Use the new multi-input method
+                response = study_expert.process_query_with_inputs(
+                    category=category,
+                    question=question,
+                    study_hours=study_hours,
+                    stress_level=stress_level,
+                    learning_style=learning_style,
+                    has_upcoming_exam=has_upcoming_exam,
+                    sleep_hours=sleep_hours
+                )
+                
+                if response:
+                    display_study_guide_response(response)
+                else:
+                    st.error("❌ Unable to generate recommendations. Please try again.")
+    
+    # Legacy simple interface (collapsible)
+    with st.expander("📖 Simple Mode (Text-only questions)", expanded=False):
+        st.markdown("*Use this if you prefer quick text-based queries*")
+        
+        SIMPLE_CATEGORIES = {
+            'Study Techniques': [
+                'How can I improve my memory?',
+                'What are active learning methods?',
+                'How do I make effective notes?'
+            ],
+            'Wellness': [
+                "I feel anxious about exams",
+                "I'm feeling overwhelmed with studies",
+                "I can't sleep well during exam time"
+            ],
+            'Motivation': [
+                "I keep procrastinating",
+                "I've lost my motivation to study",
+                'How to build study confidence'
+            ]
+        }
+        
+        simple_cat = st.selectbox("Category", list(SIMPLE_CATEGORIES.keys()), key="simple_cat")
+        simple_q = st.selectbox("Question", SIMPLE_CATEGORIES[simple_cat], key="simple_q")
+        
+        if st.button("Get Quick Advice", key="simple_btn"):
+            with st.spinner("🤔 Consulting the study guide..."):
+                response = study_expert.process_query(simple_q)
+                if response:
+                    display_study_guide_response(response)
 
 def display_study_guide_response(response):
     """Display study guide response with proper formatting."""
     if isinstance(response, dict):
+        # Display user profile summary if available
+        if response.get('user_profile'):
+            profile = response['user_profile']
+            with st.expander("👤 Your Profile Summary", expanded=False):
+                cols = st.columns(3)
+                if profile.get('study_hours'):
+                    cols[0].metric("📚 Study Hours/Day", f"{profile['study_hours']}h")
+                if profile.get('stress_level'):
+                    stress_color = "🔴" if profile['stress_level'] >= 7 else "🟡" if profile['stress_level'] >= 4 else "🟢"
+                    cols[1].metric("😰 Stress Level", f"{stress_color} {profile['stress_level']}/10")
+                if profile.get('sleep_hours'):
+                    sleep_emoji = "✅" if profile['sleep_hours'] >= 7 else "⚠️"
+                    cols[2].metric("😴 Sleep Hours", f"{sleep_emoji} {profile['sleep_hours']}h")
+                
+                if profile.get('learning_style'):
+                    st.info(f"🎨 **Learning Style:** {profile['learning_style'].capitalize()}")
+                if profile.get('has_upcoming_exam'):
+                    st.warning("📅 **Upcoming Exam:** Yes - using time-sensitive strategies")
+        
+        # Display confidence score
+        if response.get('confidence'):
+            st.info(f"💯 **Confidence:** {response['confidence']:.0%}")
+        
         # Display concept/diagnosis
         if response.get('concept'):
-            st.markdown(f"### {response['concept']}")
+            st.success(f"### {response['concept']}")
         
         if response.get('diagnosis'):
-            st.info(f"**Diagnosis:** {response['diagnosis']}")
+            st.markdown(f"**💡 Diagnosis:** {response['diagnosis']}")
         
         # Display explanation
         if response.get('explanation'):
-            st.markdown(response['explanation'])
+            st.markdown(f"**📝 Explanation:**\n\n{response['explanation']}")
         
-        # Display recommendations
+        # Display recommendations (highlighted)
         if response.get('recommendation'):
-            with st.expander("💡 Recommended Actions", expanded=True):
-                st.markdown(response['recommendation'])
+            st.markdown("### ✅ Personalized Recommendations")
+            st.markdown(response['recommendation'])
         
         # Display examples
-        if response.get('examples'):
-            with st.expander("✅ Practical Examples"):
+        if response.get('examples') and len(response['examples']) > 0:
+            with st.expander("📚 Practical Examples"):
                 for example in response['examples']:
-                    st.markdown(f"- {example}")
+                    st.markdown(f"• {example}")
         
         # Display additional resources
-        if response.get('resources'):
-            with st.expander("📚 Additional Resources"):
+        if response.get('resources') and len(response['resources']) > 0:
+            with st.expander("🔗 Additional Resources"):
                 for resource in response['resources']:
-                    st.markdown(f"- {resource}")
+                    st.markdown(f"• {resource}")
+        
+        # Display reasoning trace (optional expander)
+        if response.get('reasoning_trace') and len(response['reasoning_trace']) > 0:
+            with st.expander("🔍 View Reasoning Process (Explainability)"):
+                st.markdown("**How the system arrived at this conclusion:**")
+                for step in response['reasoning_trace']:
+                    st.markdown(f"- {step}")
+        
+        # Display inferred facts (for advanced users)
+        if response.get('inferred_facts') and len(response['inferred_facts']) > 0:
+            with st.expander("🧠 Inferred Facts & Patterns"):
+                st.markdown("**Additional insights discovered from your inputs:**")
+                for fact in response['inferred_facts']:
+                    st.markdown(f"• {fact}")
+        
+        # Display fired rules (for debugging/transparency)
+        if response.get('fired_rules') and len(response['fired_rules']) > 0:
+            with st.expander("⚙️ Rules Applied (Technical Details)"):
+                st.markdown(f"**{len(response['fired_rules'])} rules were triggered:**")
+                for rule_id in response['fired_rules']:
+                    st.code(rule_id)
     else:
         st.markdown(str(response))
         if st.button("How does respiration work?"):

@@ -1,0 +1,470 @@
+{
+  "memory": {
+    "keywords": ["memory", "remember", "recall", "memorize", "forget", "retention", "spaced repetition", "memory palace"],
+    "concept": "🧠 Memory Enhancement Techniques",
+    "diagnosis": "You need scientifically-proven memory techniques",
+    "confidence": 0.9,
+    "rules": [
+      {
+        "id": "memory_001",
+        "condition": "mentions_memory",
+        "recommend": "Use spaced repetition (Day 1, 3, 7, 14, 30)",
+        "confidence": 0.95,
+        "priority": 1
+      },
+      {
+        "id": "memory_002",
+        "condition": "mentions_memory",
+        "recommend": "Practice active recall - test yourself instead of re-reading",
+        "confidence": 0.92,
+        "priority": 2
+      },
+      {
+        "id": "memory_003",
+        "condition": "low_sleep",
+        "recommend": "Improve sleep to 7-8 hours for better memory consolidation",
+        "confidence": 0.85,
+        "priority": 3
+      }
+    ],
+    "explanation": "Memory works in 3 stages: Encoding → Storage → Retrieval. Spaced repetition strengthens long-term storage, active recall improves retrieval, and sleep consolidates memories during rest.",
+    "examples": [
+      "Use Anki app for automated spaced repetition",
+      "Teach concepts to others (Feynman Technique)",
+      "Create mind maps to visualize connections",
+      "Use mnemonic devices for complex information"
+    ],
+    "resources": [
+      "Anki (free spaced repetition app)",
+      "Book: 'Make It Stick' by Brown, Roediger & McDaniel",
+      "Coursera: Learning How to Learn"
+    ]
+  },
+  "stress": {
+    "keywords": ["stress", "anxious", "anxiety", "nervous", "panic", "worried", "overwhelm", "pressure"],
+    "concept": "🧘 Stress & Anxiety Management",
+    "diagnosis": "You are experiencing exam-related stress - affects 60-70% of students",
+    "confidence": 0.88,
+    "rules": [
+      {
+        "id": "stress_001",
+        "condition": "high_stress",
+        "recommend": "Practice 4-7-8 breathing: Inhale 4 sec, Hold 7 sec, Exhale 8 sec",
+        "confidence": 0.90,
+        "priority": 1,
+        "triggers": ["low_focus"]
+      },
+      {
+        "id": "stress_002",
+        "condition": "high_stress",
+        "recommend": "Use grounding technique (5-4-3-2-1): 5 things you see, 4 touch, 3 hear, 2 smell, 1 taste",
+        "confidence": 0.85,
+        "priority": 2
+      },
+      {
+        "id": "stress_003",
+        "condition": "exam_anxiety",
+        "recommend": "Practice past papers under timed conditions to reduce fear of unknown",
+        "confidence": 0.88,
+        "priority": 3
+      },
+      {
+        "id": "stress_004",
+        "condition": "high_stress",
+        "recommend": "Regular exercise (30 min, 3x/week) reduces cortisol naturally",
+        "confidence": 0.82,
+        "priority": 4
+      }
+    ],
+    "explanation": "Your body enters fight-or-flight mode when facing exams. This causes racing heart, sweaty palms, and mind going blank. Root causes include fear of failure, perfectionism, poor preparation, and past negative experiences.",
+    "examples": [
+      "Before exam: 3 rounds of 4-7-8 breathing",
+      "During panic: Use 5-4-3-2-1 grounding",
+      "Daily: 10-minute meditation with Headspace app",
+      "Morning routine: 20-minute walk reduces cortisol"
+    ],
+    "resources": [
+      "Headspace app (guided meditation)",
+      "YouTube: The Honest Guys (guided relaxation)",
+      "Book: 'Why Zebras Don't Get Ulcers' by Sapolsky"
+    ]
+  },
+  "procrastination": {
+    "keywords": ["procrastinate", "procrastinating", "delay", "distracted", "avoid", "lazy", "can't start"],
+    "concept": "⏰ Overcoming Procrastination",
+    "diagnosis": "You are stuck in the procrastination cycle - it's about emotion regulation, not laziness",
+    "confidence": 0.87,
+    "rules": [
+      {
+        "id": "procrastination_001",
+        "condition": "procrastinating",
+        "recommend": "Use 2-minute rule: Commit to just 2 minutes - usually leads to more",
+        "confidence": 0.91,
+        "priority": 1
+      },
+      {
+        "id": "procrastination_002",
+        "condition": "procrastinating",
+        "recommend": "Pomodoro Technique: 25 min focus + 5 min break cycles",
+        "confidence": 0.89,
+        "priority": 2
+      },
+      {
+        "id": "procrastination_003",
+        "condition": "task_aversion",
+        "recommend": "Break large tasks into tiny steps (chunking)",
+        "confidence": 0.86,
+        "priority": 3
+      },
+      {
+        "id": "procrastination_004",
+        "condition": "distractions",
+        "recommend": "Remove phone from room and use website blockers",
+        "confidence": 0.84,
+        "priority": 4
+      }
+    ],
+    "explanation": "Procrastination happens due to: task aversion (feels painful), perfectionism, overwhelm, instant gratification bias, and fear of failure. The cycle: Task → Anxiety → Temporary relief → Guilt → More anxiety.",
+    "examples": [
+      "Set timer for 2 minutes and start easiest sub-task",
+      "Use Forest app to gamify focus time",
+      "Study buddy accountability check-ins",
+      "Implementation intention: 'At 3pm, in library, study Chapter 5'"
+    ],
+    "resources": [
+      "Forest app (gamified focus timer)",
+      "Cold Turkey (website blocker)",
+      "Book: 'Atomic Habits' by James Clear"
+    ]
+  },
+  "time_management": {
+    "keywords": ["time management", "schedule", "plan", "organize", "prioritize", "time", "manage time"],
+    "concept": "⏰ Effective Time Management",
+    "diagnosis": "You need a structured study system with clear priorities",
+    "confidence": 0.86,
+    "rules": [
+      {
+        "id": "time_001",
+        "condition": "poor_time_management",
+        "recommend": "Use time blocking: Assign specific time slots to specific subjects",
+        "confidence": 0.90,
+        "priority": 1
+      },
+      {
+        "id": "time_002",
+        "condition": "poor_time_management",
+        "recommend": "Apply Eisenhower Matrix: Urgent+Important = Do now, Important only = Schedule",
+        "confidence": 0.87,
+        "priority": 2
+      },
+      {
+        "id": "time_003",
+        "condition": "poor_time_management",
+        "recommend": "Weekly review: Plan each Sunday for the week ahead",
+        "confidence": 0.85,
+        "priority": 3
+      },
+      {
+        "id": "time_004",
+        "condition": "energy_management",
+        "recommend": "Do hardest subjects when energy is highest (usually morning)",
+        "confidence": 0.83,
+        "priority": 4
+      }
+    ],
+    "explanation": "Poor time management leads to cramming, incomplete understanding, and high stress. Most students FEEL busy but aren't PRODUCTIVE. A system provides clear plans, reduces stress, and ensures balanced coverage.",
+    "examples": [
+      "Google Calendar with color-coded study blocks",
+      "Sunday planning: 30 min to plan week ahead",
+      "Daily top 3: Pick 3 most important tasks",
+      "Energy optimization: Hard subjects at 8am when fresh"
+    ],
+    "resources": [
+      "Google Calendar (time blocking)",
+      "Notion (all-in-one planner)",
+      "Todoist (task management)",
+      "Book: 'Deep Work' by Cal Newport"
+    ]
+  },
+  "exam_prep": {
+    "keywords": ["exam", "test", "preparation", "prepare", "night before", "cramming", "exam day"],
+    "concept": "📝 Exam Preparation Strategy",
+    "diagnosis": "You need a strategic, timeline-based exam prep plan",
+    "confidence": 0.89,
+    "rules": [
+      {
+        "id": "exam_001",
+        "condition": "exam_coming",
+        "recommend": "Practice past papers under timed conditions (most effective prep)",
+        "confidence": 0.94,
+        "priority": 1
+      },
+      {
+        "id": "exam_002",
+        "condition": "one_week_before",
+        "recommend": "Focus on high-weightage topics (80/20 rule)",
+        "confidence": 0.91,
+        "priority": 2
+      },
+      {
+        "id": "exam_003",
+        "condition": "night_before",
+        "recommend": "Light review only, no new material - sleep by 10pm",
+        "confidence": 0.88,
+        "priority": 3
+      },
+      {
+        "id": "exam_004",
+        "condition": "exam_day",
+        "recommend": "Arrive 20 min early, do breathing exercises, avoid anxious students",
+        "confidence": 0.86,
+        "priority": 4
+      }
+    ],
+    "explanation": "Timeline matters: 3 months = foundation, 1 month = intensive revision, 1 week = practice & polish, 1 day = light review & mental prep. Common mistakes include cramming, passive reading, and not practicing under exam conditions.",
+    "examples": [
+      "1 week before: Complete 2-3 past papers under timed conditions",
+      "Night before: Materials ready, light review, sleep by 10pm",
+      "Exam day: Protein breakfast, arrive early, bathroom first",
+      "During exam: Read all questions first, do easy ones first"
+    ],
+    "resources": [
+      "Past exam papers from your institution",
+      "Marking schemes and model answers",
+      "YouTube: Subject-specific exam tips"
+    ]
+  },
+  "motivation": {
+    "keywords": ["motivation", "motivate", "lost interest", "give up", "no motivation", "unmotivated"],
+    "concept": "🔥 Rebuilding Study Motivation",
+    "diagnosis": "You have lost your 'why' - motivation loss is normal and fixable",
+    "confidence": 0.85,
+    "rules": [
+      {
+        "id": "motivation_001",
+        "condition": "low_motivation",
+        "recommend": "Reconnect with your 'why': Write down why you started and your bigger goal",
+        "confidence": 0.89,
+        "priority": 1
+      },
+      {
+        "id": "motivation_002",
+        "condition": "low_motivation",
+        "recommend": "Set micro-goals: 'Study 25 minutes' not 'Master this subject'",
+        "confidence": 0.87,
+        "priority": 2
+      },
+      {
+        "id": "motivation_003",
+        "condition": "no_progress_visible",
+        "recommend": "Track progress visually with habit tracker or checklist",
+        "confidence": 0.84,
+        "priority": 3,
+        "triggers": ["increased_motivation"]
+      },
+      {
+        "id": "motivation_004",
+        "condition": "burnout",
+        "recommend": "Schedule guilt-free breaks and activities you enjoy",
+        "confidence": 0.82,
+        "priority": 4
+      }
+    ],
+    "explanation": "Motivation fades due to: no clear goals, lack of visible progress, burnout, disconnection from purpose, comparison to others. IMPORTANT: Motivation follows action, not the other way around!",
+    "examples": [
+      "Morning routine: Read written goal aloud before studying",
+      "Vision board with career goals on wall",
+      "Daily win journal: Write 3 things achieved",
+      "Study group for scheduled accountability"
+    ],
+    "resources": [
+      "Habitica app (gamified habit tracking)",
+      "Streaks app (visual progress)",
+      "Book: 'Atomic Habits' by James Clear",
+      "YouTube: Ali Abdaal study strategies"
+    ]
+  },
+  "confidence": {
+    "keywords": ["confidence", "not smart", "stupid", "dumb", "bad test", "feel stupid", "not good enough"],
+    "concept": "💪 Building Study Confidence",
+    "diagnosis": "Low confidence is blocking your potential - this is about mindset, not ability",
+    "confidence": 0.88,
+    "rules": [
+      {
+        "id": "confidence_001",
+        "condition": "low_confidence",
+        "recommend": "Adopt growth mindset: Replace 'I can't' with 'I can't YET'",
+        "confidence": 0.92,
+        "priority": 1,
+        "triggers": ["increased_confidence"]
+      },
+      {
+        "id": "confidence_002",
+        "condition": "low_confidence",
+        "recommend": "Keep wins journal: Write 3 daily wins to build evidence of capability",
+        "confidence": 0.88,
+        "priority": 2
+      },
+      {
+        "id": "confidence_003",
+        "condition": "comparison_trap",
+        "recommend": "Stop comparing to others - only compete with past you",
+        "confidence": 0.85,
+        "priority": 3
+      },
+      {
+        "id": "confidence_004",
+        "condition": "low_confidence",
+        "recommend": "Build confidence staircase: Start with easy problems, gradually increase difficulty",
+        "confidence": 0.83,
+        "priority": 4
+      }
+    ],
+    "explanation": "Confidence myths: Intelligence is NOT fixed - it's built through effort (neuroplasticity). Real issues: fixed mindset, comparison trap, imposter syndrome, letting one result define you. Intelligence = Effort × Strategy × Time.",
+    "examples": [
+      "Morning affirmation: 'I am capable of learning anything'",
+      "Wins journal: Daily entry of one thing done well",
+      "Confidence staircase: 5 easy problems first (builds momentum)",
+      "Reframe failures: 'I learned what doesn't work'"
+    ],
+    "resources": [
+      "Book: 'Mindset' by Carol Dweck",
+      "TED Talk: The Power of Believing You Can Improve",
+      "YouTube: Growth mindset videos"
+    ]
+  },
+  "sleep": {
+    "keywords": ["sleep", "insomnia", "tired", "exhausted", "can't sleep", "sleep problem"],
+    "concept": "😴 Sleep & Study Performance",
+    "diagnosis": "Poor sleep is sabotaging your study effectiveness",
+    "confidence": 0.90,
+    "rules": [
+      {
+        "id": "sleep_001",
+        "condition": "poor_sleep",
+        "recommend": "Consistent schedule: Same bedtime and wake time (even weekends)",
+        "confidence": 0.93,
+        "priority": 1,
+        "triggers": ["improved_memory", "reduced_stress"]
+      },
+      {
+        "id": "sleep_002",
+        "condition": "poor_sleep",
+        "recommend": "Digital sunset: No screens 1 hour before bed (blue light suppresses melatonin)",
+        "confidence": 0.90,
+        "priority": 2
+      },
+      {
+        "id": "sleep_003",
+        "condition": "racing_thoughts",
+        "recommend": "Write worry list before bed to empty mind",
+        "confidence": 0.86,
+        "priority": 3
+      },
+      {
+        "id": "sleep_004",
+        "condition": "poor_sleep",
+        "recommend": "Sleep environment: Cool (18-20°C), dark, quiet",
+        "confidence": 0.84,
+        "priority": 4
+      }
+    ],
+    "explanation": "During sleep, your brain: consolidates memories (short-term → long-term), clears toxins, strengthens neural connections. One all-nighter = 40% reduction in memory formation. Poor sleep causes reduced focus, impaired problem-solving, mood issues.",
+    "examples": [
+      "10pm routine: Shower → Read → Lights out by 11pm",
+      "Morning sunlight exposure (resets circadian rhythm)",
+      "If can't sleep after 20 min: Get up, do boring activity, return when sleepy",
+      "No caffeine after 2pm"
+    ],
+    "resources": [
+      "Sleep Cycle app (tracks sleep quality)",
+      "Calm app (sleep stories)",
+      "Book: 'Why We Sleep' by Matthew Walker",
+      "YouTube: Sleep meditation videos"
+    ]
+  },
+  "focus": {
+    "keywords": ["focus", "concentration", "distraction", "attention", "mind wandering", "procrastinate"],
+    "concept": "🎯 Focus & Concentration Enhancement",
+    "diagnosis": "You need strategies to improve concentration and reduce distractions",
+    "confidence": 0.88,
+    "rules": [
+      {
+        "id": "focus_001",
+        "condition": "mentions_focus",
+        "recommend": "Use the Pomodoro Technique: 25 minutes focused work, 5 minute break",
+        "confidence": 0.92,
+        "priority": 1
+      },
+      {
+        "id": "focus_002",
+        "condition": "mentions_focus",
+        "recommend": "Eliminate digital distractions: Turn off phone notifications and use website blockers",
+        "confidence": 0.90,
+        "priority": 2
+      },
+      {
+        "id": "focus_003",
+        "condition": "high_stress",
+        "recommend": "Practice mindfulness meditation (10 min/day) to improve attention control",
+        "confidence": 0.87,
+        "priority": 3
+      },
+      {
+        "id": "focus_004",
+        "condition": "low_sleep",
+        "recommend": "Prioritize sleep - even one hour more can dramatically improve focus",
+        "confidence": 0.88,
+        "priority": 4
+      },
+      {
+        "id": "focus_005",
+        "condition": "mentions_focus",
+        "recommend": "Create a dedicated study space with minimal distractions",
+        "confidence": 0.85,
+        "priority": 5
+      }
+    ],
+    "explanation": "Focus is the ability to direct attention to a single task while filtering out distractions. It depends on your prefrontal cortex, which is affected by stress, sleep, and environment. Research shows focused work sessions (25-90 min) with breaks are more effective than marathon sessions.",
+    "examples": [
+      "Use forest/pomodoro apps to gamify focus time",
+      "Study in library instead of dorm room",
+      "Schedule difficult tasks for your peak energy time (morning for most people)",
+      "Use background music (binaural beats, lo-fi) if it helps you concentrate",
+      "Practice single-tasking: close all tabs except the one you're working on"
+    ],
+    "resources": [
+      "Book: Deep Work by Cal Newport",
+      "App: Forest (phone blocking app)",
+      "App: Freedom (website blocker)",
+      "YouTube: Study With Me videos (accountability)",
+      "Technique: Flow State triggers"
+    ]
+  },
+  "inferences": {
+    "high_stress_to_low_focus": {
+      "from_fact": "stress_level=high",
+      "infer_fact": "focus_level=low",
+      "confidence": 0.85,
+      "explanation": "High stress impairs prefrontal cortex function, reducing focus ability"
+    },
+    "poor_sleep_to_weak_memory": {
+      "from_fact": "sleep_hours<7",
+      "infer_fact": "memory_consolidation=weak",
+      "confidence": 0.90,
+      "explanation": "Sleep deprivation prevents memory consolidation during REM and deep sleep"
+    },
+    "low_motivation_to_procrastination": {
+      "from_fact": "motivation_level=low",
+      "infer_fact": "procrastination_risk=high",
+      "confidence": 0.78,
+      "explanation": "Low motivation increases likelihood of task avoidance"
+    },
+    "exam_anxiety_to_stress": {
+      "from_fact": "exam_anxiety=true",
+      "infer_fact": "stress_level=high",
+      "confidence": 0.92,
+      "explanation": "Exam anxiety triggers physiological stress response"
+    }
+  }
+}
