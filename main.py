@@ -1,7 +1,7 @@
 """
 EduMentor - O/L Multi-Subject Tutor Expert System
 --------------------------------------------------
-NEW ARCHITECTURE: Intent Classifier + Traditional @Rule Expert Systems + Response Refinement
+AGENT ARCHITECTURE: Expert Agent using Expert Systems as Tools
 """
 
 import streamlit as st
@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-from core.orchestrator import SystemOrchestrator
+from agents.expert_agent import ExpertAgent
 
 # Page configuration
 st.set_page_config(
@@ -76,111 +76,73 @@ st.markdown("""
 
 @st.cache_resource
 def initialize_system():
-    """Initialize the orchestrator (cached for performance)."""
-    return SystemOrchestrator()
+    """Initialize the Expert Agent (cached for performance)."""
+    return ExpertAgent()
 
 
-def get_orchestrator():
-    """Get or create orchestrator for this session."""
-    if 'orchestrator' not in st.session_state:
-        st.session_state.orchestrator = SystemOrchestrator()
-    return st.session_state.orchestrator
+def get_agent():
+    """Get or create Expert Agent for this session."""
+    if 'agent' not in st.session_state:
+        st.session_state.agent = ExpertAgent()
+    return st.session_state.agent
 
 
 def display_response(result: dict):
     """Display the system's response based on type."""
     
-    response_type = result.get('response_type', 'answer')
-    
-    if response_type == 'clarification_request':
+    # Check if this is a clarification request
+    if result.get('needs_clarification'):
         st.markdown('<div class="clarification-box">', unsafe_allow_html=True)
-        st.markdown("### 🤔 Clarification Needed")
-        st.markdown(result['content'])
+        st.markdown("### 🤔 Let me understand better...")
+        st.markdown(result['response'])
         st.markdown('</div>', unsafe_allow_html=True)
+        return
     
-    elif response_type == 'diagnosis':
-        # Diagnostic expert response (Study Guide)
-        st.markdown('<div class="diagnosis-box">', unsafe_allow_html=True)
-        
-        # Diagnosis header
-        diagnosis_data = result.get('expert_rule', result)
-        concept = diagnosis_data.get('concept', 'Diagnosis')
-        confidence = diagnosis_data.get('confidence', 'High')
-        
-        # Display confidence badge
-        if 'Medium' in confidence or 'Low' in confidence:
-            st.warning(f"**{concept}** (Confidence: {confidence})")
-        else:
-            st.success(f"**{concept}**")
-        
-        # Main diagnosis
-        if diagnosis_data.get('diagnosis'):
-            st.markdown("### 📋 Problem Identified")
-            st.markdown(diagnosis_data['diagnosis'])
-        
-        # Explanation
-        if diagnosis_data.get('explanation'):
-            st.markdown("### 📖 Why This Happens")
-            st.markdown(diagnosis_data['explanation'])
-        
-        # Recommendations (most important!)
-        if diagnosis_data.get('recommendation'):
-            with st.expander("💡 **Personalized Action Plan** (Click to expand)", expanded=True):
-                st.markdown(diagnosis_data['recommendation'])
-        
-        # Reasoning chain (explainability)
-        if diagnosis_data.get('reasoning_chain'):
-            with st.expander("🔍 How I Reached This Conclusion", expanded=False):
-                st.markdown("**Reasoning Steps:**")
-                for i, step in enumerate(diagnosis_data['reasoning_chain'], 1):
-                    st.markdown(f"{i}. {step}")
-        
-        # Examples
-        if diagnosis_data.get('examples'):
-            with st.expander("📝 Practice Suggestions", expanded=False):
-                for example in diagnosis_data['examples']:
-                    st.markdown(f"- {example}")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-    elif response_type == 'answer':
-        # Display topic and concept
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            st.info(f"**Subject:** {result.get('subject', 'N/A')}")
-        with col2:
-            st.success(f"**Concept:** {result.get('concept', 'N/A')}")
-        
-        # Expert System Rule (Original)
-        with st.expander("📖 Expert System Rule (Click to expand)", expanded=False):
-            st.markdown('<div class="expert-rule-box">', unsafe_allow_html=True)
-            st.markdown(result.get('expert_rule', 'N/A'))
-            st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Refined Response (LLM-enhanced)
-        st.markdown("### 🌟 AI-Enhanced Explanation")
-        st.markdown('<div class="refined-response-box">', unsafe_allow_html=True)
-        st.markdown(result['content'])
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Examples
-        if result.get('examples'):
-            st.markdown("### 💡 Examples")
-            for example in result['examples']:
-                st.markdown(f"- {example}")
+    # Display tool used
+    tool_used = result.get('tool_used', 'Unknown')
+    st.info(f"**🔧 Tool Used:** {tool_used.replace('_', ' ').title()}")
     
-    elif response_type == 'error':
-        st.error(result['content'])
+    # Display the enhanced response
+    st.markdown("### � Answer")
+    st.markdown(result['response'])
+    
+    # Show expert system details in expander
+    if result.get('raw_expert_response'):
+        with st.expander("🔍 Expert System Details", expanded=False):
+            expert_data = result['raw_expert_response']
+            
+            if isinstance(expert_data, dict):
+                if expert_data.get('concept'):
+                    st.markdown(f"**Concept:** {expert_data['concept']}")
+                if expert_data.get('topic'):
+                    st.markdown(f"**Topic:** {expert_data['topic']}")
+                if expert_data.get('explanation'):
+                    st.markdown("**Expert Explanation:**")
+                    st.markdown(expert_data['explanation'])
+                if expert_data.get('examples'):
+                    st.markdown("**Examples:**")
+                    for ex in expert_data['examples']:
+                        st.markdown(f"- {ex}")
+    
+    # Show analysis details
+    if result.get('analysis'):
+        with st.expander("🧠 Agent Analysis", expanded=False):
+            analysis = result['analysis']
+            # Handle both old (query_topic) and new (topics) format
+            topics = result.get('query_topics', [analysis.get('query_topic')]) if analysis.get('query_topic') else result.get('query_topics', [])
+            if topics and topics != [None]:
+                st.markdown(f"**Query Topic(s):** {', '.join(topics)}")
+            st.markdown(f"**Reasoning:** {analysis.get('reasoning', 'N/A')}")
 
 
 def main():
     """Main application."""
     
-    # Initialize session state for orchestrator if not exists
-    if 'orchestrator' not in st.session_state:
-        st.session_state.orchestrator = SystemOrchestrator()
+    # Initialize session state for agent if not exists
+    if 'agent' not in st.session_state:
+        st.session_state.agent = ExpertAgent()
     
-    orchestrator = st.session_state.orchestrator
+    agent = st.session_state.agent
     
     # Initialize messages if not exists
     if 'messages' not in st.session_state:
@@ -188,41 +150,46 @@ def main():
     
     # Header
     st.markdown('<p class="main-header">🎓 EduMentor</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Your Intelligent O/L Tutor with Traditional Expert Systems</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Agent-Powered O/L Tutor using Expert Systems as Tools</p>', unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
         st.markdown("## ℹ️ System Architecture")
         st.markdown("""
-        **New Design:**
-        1. 🎯 **Intent Classifier** (LLM)
-           - Understands your question
-           - Routes to correct subject
+        **Agent-Tool Pattern:**
         
-        2. 🎓 **Expert Systems** (@Rule-based)
-           - Biology, Physics, Chemistry, Math, History
-           - Traditional Experta inference engine
-           - Pattern matching with @Rule decorators
+        1. 🤖 **Expert Agent** (Coordinator)
+           - Powered by Gemini LLM
+           - Analyzes student queries
+           - Selects appropriate tool
+           - Enhances responses
         
-        3. 🌟 **Response Refiner** (LLM)
-           - Makes expert output friendly
-           - NO new facts added
-           - Pure language enhancement
+        2. 🔧 **Expert System Tools**
+           - Biology Expert (@Rule-based)
+           - Physics Expert (@Rule-based)
+           - Chemistry Expert (@Rule-based)
+           - Study Guide Expert (Diagnostic)
         
-        4. 🧠 **Conversation Memory**
-           - Remembers context
-           - Helps with clarifications
+        3. ⚙️ **Process Flow**
+           - Query Analysis → Tool Selection → Expert Execution → Response Enhancement
+        
+        **Benefits:**
+        - Clear separation of concerns
+        - Expert systems as reusable tools
+        - LLM provides intelligence layer
+        - Traditional rules provide accuracy
         """)
         
         st.markdown("---")
         
         # Stats
         if st.button("📊 View Conversation Stats"):
-            stats = orchestrator.get_conversation_stats()
-            st.json(stats)
+            st.info(f"**Conversations:** {len(agent.conversation_history)}")
+            st.info(f"**Available Tools:** {', '.join(agent.tools.keys())}")
         
         if st.button("🗑️ Clear History"):
-            orchestrator.clear_conversation()
+            agent.reset()
+            st.session_state.messages = []
             st.success("Conversation cleared!")
             st.rerun()
         
@@ -262,7 +229,7 @@ def main():
         # Process query
         with st.chat_message("assistant"):
             with st.spinner("🤔 Thinking..."):
-                result = orchestrator.process_query(prompt)
+                result = agent.process_query(prompt)
                 display_response(result)
                 st.session_state.messages.append({"role": "assistant", "content": result})
     
