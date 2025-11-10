@@ -20,12 +20,9 @@ class StudyGuideExpert(KnowledgeEngine):
         self.reasoning_trace = []
         self.inferred_facts = []
         self.confidence_scores = []
-        try:
-            from nlp_processor import NLPProcessor
-            self.nlp = NLPProcessor()
-        except ImportError:
-            from experts.nlp_processor import NLPProcessor
-            self.nlp = NLPProcessor()
+        self.uncertainty_factors = []
+        self.missing_info_warnings = []
+        self.confidence_breakdown = {}
     
     def process_query_with_inputs(self, category, question, study_hours=None, stress_level=None, 
                                    learning_style=None, has_upcoming_exam=None, sleep_hours=None):
@@ -47,21 +44,57 @@ class StudyGuideExpert(KnowledgeEngine):
         self.reasoning_trace = []
         self.inferred_facts = []
         self.confidence_scores = []
+        self.uncertainty_factors = []
+        self.missing_info_warnings = []
+        self.confidence_breakdown = {}
+        
+        # Analyze data completeness
+        total_inputs = 5  # study_hours, stress_level, learning_style, has_upcoming_exam, sleep_hours
+        provided_inputs = sum([
+            study_hours is not None,
+            stress_level is not None,
+            learning_style is not None,
+            has_upcoming_exam is not None,
+            sleep_hours is not None
+        ])
+        
+        data_completeness = (provided_inputs / total_inputs) * 100
         
         # Log inputs
-        self.reasoning_trace.append(f"📋 Input Analysis:")
+        self.reasoning_trace.append("📋 Input Analysis:")
         self.reasoning_trace.append(f"  • Category: {category}")
         self.reasoning_trace.append(f"  • Question: {question}")
+        self.reasoning_trace.append(f"  • Data Completeness: {data_completeness:.0f}% ({provided_inputs}/{total_inputs} fields)")
+        
         if study_hours is not None:
             self.reasoning_trace.append(f"  • Study Hours/Day: {study_hours}")
+        else:
+            self.missing_info_warnings.append("study_hours")
+            self.uncertainty_factors.append(("missing_study_hours", 0.08))
+            
         if stress_level is not None:
             self.reasoning_trace.append(f"  • Stress Level: {stress_level}/10")
+        else:
+            self.missing_info_warnings.append("stress_level")
+            self.uncertainty_factors.append(("missing_stress_level", 0.10))
+            
         if learning_style:
             self.reasoning_trace.append(f"  • Learning Style: {learning_style}")
+        else:
+            self.missing_info_warnings.append("learning_style")
+            self.uncertainty_factors.append(("missing_learning_style", 0.06))
+            
         if has_upcoming_exam is not None:
             self.reasoning_trace.append(f"  • Upcoming Exam: {'Yes' if has_upcoming_exam else 'No'}")
+        else:
+            self.missing_info_warnings.append("has_upcoming_exam")
+            self.uncertainty_factors.append(("missing_exam_info", 0.04))
+            
         if sleep_hours is not None:
             self.reasoning_trace.append(f"  • Sleep Hours: {sleep_hours}")
+        else:
+            self.missing_info_warnings.append("sleep_hours")
+            self.uncertainty_factors.append(("missing_sleep_hours", 0.07))
         
         # Update user profile
         self.update_user_profile(
@@ -91,32 +124,22 @@ class StudyGuideExpert(KnowledgeEngine):
         if sleep_hours is not None:
             self.declare(Fact(sleep_hours=sleep_hours))
         
-        # Process with NLP for additional context
-        nlp_result = self.nlp.process_query(question, self.kb)
-        self.declare(Fact(processed_query=nlp_result))
-        
         self.reasoning_trace.append("\n🔍 Inference Engine Running...")
         self.run()
         
         return self.response
     
     def process_query(self, query):
-        """Legacy method for backward compatibility"""
+        """Legacy method for backward compatibility - simplified version without NLP"""
         self.reset()
         self.response = None
         self.fired_rules = []
         self.reasoning_trace = []
         self.inferred_facts = []
         self.confidence_scores = []
-        nlp_result = self.nlp.process_query(query, self.kb)
+        
         self.reasoning_trace.append(f"Query: {query}")
-        self.reasoning_trace.append(f"Intents: {nlp_result['intents'][:2]}")
         self.declare(Fact(user_query=query.lower()))
-        self.declare(Fact(processed_query=nlp_result))
-        for key, val in nlp_result["entities"].items():
-            self.declare(Fact(**{key: val}))
-        for c in nlp_result["conditions"]:
-            self.declare(Fact(condition=c))
         self.reasoning_trace.append("Running inference...")
         self.run()
         return self.response
@@ -240,6 +263,75 @@ class StudyGuideExpert(KnowledgeEngine):
         self.inferred_facts.append("verbal_learning_recommended")
         self.reasoning_trace.append("✅ Rule Fired: Auditory learner → Recommend discussion/verbal methods")
     
+    # Rule 11: Reading/Writing learner → Text-based methods
+    @Rule(
+        AS.f << Fact(learning_style="reading writing"),
+        salience=8
+    )
+    def infer_reading_writing_methods(self):
+        self.declare(Fact(condition="use_text_based_learning"))
+        self.inferred_facts.append("text_based_learning_recommended")
+        self.reasoning_trace.append("✅ Rule Fired: Reading/Writing learner → Recommend note-taking and written summaries")
+    
+    # Rule 12: High stress + High study hours + Low sleep → Critical burnout
+    @Rule(
+        AS.f1 << Fact(stress_level=MATCH.s & P(lambda x: x >= 7)),
+        AS.f2 << Fact(study_hours=MATCH.h & P(lambda x: x >= 7)),
+        AS.f3 << Fact(sleep_hours=MATCH.sl & P(lambda x: x < 7)),
+        salience=25
+    )
+    def infer_critical_burnout(self, s, h, sl):
+        self.declare(Fact(condition="critical_burnout_imminent"))
+        self.inferred_facts.append("critical_burnout_warning")
+        self.reasoning_trace.append(f"🚨 Rule Fired: High stress ({s}/10) + High study ({h}h) + Low sleep ({sl}h) → CRITICAL BURNOUT RISK!")
+        self.uncertainty_factors.append(("high_risk_detected", -0.05))
+    
+    # Rule 13: Low stress + High study hours + Good sleep → Optimal performance zone
+    @Rule(
+        AS.f1 << Fact(stress_level=MATCH.s & P(lambda x: x <= 4)),
+        AS.f2 << Fact(study_hours=MATCH.h & P(lambda x: x >= 5)),
+        AS.f3 << Fact(sleep_hours=MATCH.sl & P(lambda x: x >= 7)),
+        salience=15
+    )
+    def infer_optimal_performance(self, s, h, sl):
+        self.declare(Fact(condition="peak_performance_zone"))
+        self.inferred_facts.append("optimal_conditions_detected")
+        self.reasoning_trace.append(f"⭐ Rule Fired: Low stress ({s}/10) + Good study ({h}h) + Good sleep ({sl}h) → PEAK PERFORMANCE!")
+    
+    # Rule 14: Upcoming exam + Low study hours → Urgent intervention needed
+    @Rule(
+        AS.f1 << Fact(has_upcoming_exam=True),
+        AS.f2 << Fact(study_hours=MATCH.h & P(lambda x: x < 3)),
+        salience=20
+    )
+    def infer_urgent_exam_crisis(self, h):
+        self.declare(Fact(condition="exam_crisis"))
+        self.inferred_facts.append("urgent_exam_preparation_needed")
+        self.reasoning_trace.append(f"⚠️ Rule Fired: Upcoming exam + Low study ({h}h/day) → URGENT ACTION REQUIRED!")
+    
+    # Rule 15: No upcoming exam + High study hours → Potential overpreparation
+    @Rule(
+        AS.f1 << Fact(has_upcoming_exam=False),
+        AS.f2 << Fact(study_hours=MATCH.h & P(lambda x: x >= 9)),
+        salience=10
+    )
+    def infer_overpreparation(self, h):
+        self.declare(Fact(condition="possible_overpreparation"))
+        self.inferred_facts.append("balance_needed")
+        self.reasoning_trace.append(f"💡 Rule Fired: No immediate exam + High study ({h}h/day) → Consider work-life balance")
+    
+    # Rule 16: Moderate values across all metrics → Stable but improvable
+    @Rule(
+        AS.f1 << Fact(stress_level=MATCH.s & P(lambda x: 4 <= x <= 6)),
+        AS.f2 << Fact(study_hours=MATCH.h & P(lambda x: 3 <= x <= 6)),
+        AS.f3 << Fact(sleep_hours=MATCH.sl & P(lambda x: 6 <= x <= 8)),
+        salience=8
+    )
+    def infer_stable_baseline(self, s, h, sl):
+        self.declare(Fact(condition="stable_baseline"))
+        self.inferred_facts.append("room_for_optimization")
+        self.reasoning_trace.append(f"✓ Rule Fired: Balanced metrics → Good foundation, room for optimization")
+    
     @Rule(AS.f << Fact(condition="high_stress"), salience=10)
     def infer_low_focus(self, f):
         self.declare(Fact(condition="low_focus"))
@@ -295,6 +387,12 @@ class StudyGuideExpert(KnowledgeEngine):
         
         self.reasoning_trace.append(f"\n📊 Confidence: {final_confidence:.0%} (Base: {base_conf:.0%}, Adjustment: {adjustment:+.0%})")
         
+        # Generate missing information suggestions
+        missing_info_suggestions = self._generate_missing_info_suggestions()
+        
+        # Generate uncertainty explanation
+        uncertainty_explanation = self._generate_uncertainty_explanation(final_confidence)
+        
         self.response = {
             "concept": data.get("concept", "Study Guide"),
             "diagnosis": diagnosis,
@@ -303,6 +401,10 @@ class StudyGuideExpert(KnowledgeEngine):
             "examples": data.get("examples", [])[:5],
             "resources": data.get("resources", [])[:5],
             "confidence": final_confidence,
+            "confidence_breakdown": self.confidence_breakdown,
+            "uncertainty_explanation": uncertainty_explanation,
+            "missing_info_warnings": self.missing_info_warnings,
+            "missing_info_suggestions": missing_info_suggestions,
             "reasoning_trace": self.reasoning_trace.copy(),
             "fired_rules": self.fired_rules.copy(),
             "inferred_facts": self.inferred_facts.copy(),
@@ -311,7 +413,7 @@ class StudyGuideExpert(KnowledgeEngine):
         }
     
     def _generate_adaptive_recommendations(self, category, profile):
-        """Generate personalized recommendations based on user inputs"""
+        """Generate personalized recommendations based on user inputs and inferred conditions"""
         recs = []
         stress = profile.get("stress_level")
         study_hrs = profile.get("study_hours")
@@ -319,40 +421,96 @@ class StudyGuideExpert(KnowledgeEngine):
         learning = profile.get("learning_style")
         upcoming_exam = profile.get("has_upcoming_exam")
         
-        # High stress adaptations
+        # Critical burnout state (highest priority)
+        if "critical_burnout_warning" in self.inferred_facts:
+            recs.append("🚨 **CRITICAL: IMMEDIATE ACTION REQUIRED** - Your combination of high stress, excessive study hours, and insufficient sleep puts you at severe burnout risk. STOP studying for 24 hours and prioritize rest.")
+            recs.append("**Emergency Recovery Plan**: Sleep 8+ hours tonight, take tomorrow off completely, schedule urgent meeting with academic counselor or therapist.")
+            recs.append("**Long-term Intervention**: Your current approach is unsustainable. Shift to quality over quantity - study 4-5 hours max with proper breaks.")
+            return recs  # Return immediately - this overrides everything else
+        
+        # Peak performance zone (encourage optimization)
+        if "optimal_conditions_detected" in self.inferred_facts:
+            recs.append("⭐ **OPTIMAL STATE DETECTED** - You're in peak learning conditions! Your balanced stress, good sleep, and sufficient study hours create ideal cognitive performance.")
+            if category == "memory":
+                recs.append("**Maximize This Window**: Use advanced memory techniques like the method of loci, interleaving practice, and elaborative interrogation.")
+            elif category == "focus":
+                recs.append("**Deep Work Potential**: Your conditions are perfect for 90-minute deep work sessions. Tackle your most challenging material now.")
+            else:
+                recs.append("**Compound Your Advantage**: This is the time to learn new, complex material. Your brain is primed for deep understanding.")
+            recs.append("**Maintain Excellence**: Keep this routine - track what's working and replicate it daily.")
+        
+        # Urgent exam crisis
+        if "urgent_exam_preparation_needed" in self.inferred_facts:
+            recs.append(f"⏰ **EXAM CRISIS MODE** - With only {study_hrs}h/day and an exam approaching, you need emergency triage strategies.")
+            recs.append("**Priority Triage**: Focus ONLY on high-weightage topics (use 80/20 rule). Skip minor details completely.")
+            recs.append("**Intensive Study Protocol**: 3 x 90-min sessions daily with Pomodoro breaks. Use active recall and past papers only - no passive reading.")
+            recs.append("**Night-Before Strategy**: Light review only, 8 hours sleep mandatory (sacrificing sleep for cramming reduces performance 40%).")
+        
+        # Overpreparation warning
+        if "balance_needed" in self.inferred_facts:
+            recs.append(f"⚖️ **BALANCE CHECK** - You're studying {study_hrs}h/day without an immediate exam. This intensity may lead to diminishing returns.")
+            recs.append("**Optimization Advice**: Reduce to 5-6 hours of focused study. Quality > Quantity. Your brain needs rest for consolidation.")
+            recs.append("**Schedule Downtime**: Add deliberate breaks for hobbies, exercise, socializing. Burnout prevention is key for long-term success.")
+        
+        # Stable baseline (room for optimization)
+        if "room_for_optimization" in self.inferred_facts:
+            recs.append("✓ **SOLID FOUNDATION** - Your metrics show balance, but there's room for improvement to reach peak performance.")
+            if stress and 4 <= stress <= 6:
+                recs.append("**Stress Optimization**: You're in the moderate zone. Try meditation (10 min/day) to drop to optimal range (2-4).")
+            if study_hrs and 3 <= study_hrs <= 6:
+                recs.append("**Study Optimization**: Consider adding 1-2 hours of focused study using proven techniques (spaced repetition, active recall).")
+        
+        # High stress specific interventions
         if stress and stress >= 8:
-            recs.append("**PRIORITY: Stress Management** - Your stress level is very high. Practice 10-minute breathing exercises before each study session.")
+            recs.append("**PRIORITY: Stress Management** - Your stress level is critically high. Start with 4-7-8 breathing: Inhale 4s, Hold 7s, Exhale 8s (repeat 3x).")
             if category == "memory":
-                recs.append("Use **low-stress memory methods** like gentle spaced repetition instead of intensive cramming.")
+                recs.append("**Low-Stress Memory Protocol**: Avoid intense cramming - it spikes cortisol which impairs hippocampus function. Use gentle spaced repetition (10 min sessions).")
+        elif stress and stress >= 5:
+            recs.append("**Stress Reduction**: Moderate stress detected. Daily 20-min walk + 10-min meditation can significantly improve focus and retention.")
         
-        # Low sleep adaptations
+        # Sleep-specific interventions
         if sleep_hrs and sleep_hrs < 6:
-            recs.append(f"**CRITICAL: Sleep Recovery** - You're sleeping only {sleep_hrs}h/night. Aim for 7-8 hours. Memory consolidation happens during sleep!")
+            recs.append(f"**CRITICAL: Sleep Deprivation** - {sleep_hrs}h/night is severely impacting cognition. Memory consolidation drops 40% below 6 hours.")
+            recs.append("**Sleep Recovery Protocol**: Go to bed 1 hour earlier tonight. No screens 1h before bed. Cool room (18°C), complete darkness.")
             if category == "memory":
-                recs.append("Focus on **power naps** (20-30 min) after study sessions to boost memory retention.")
+                recs.append("**Sleep-Memory Connection**: 90% of learning consolidation happens during sleep. Prioritize 7-8 hours over extra study time.")
+        elif sleep_hrs and sleep_hrs < 7:
+            recs.append(f"**Sleep Optimization**: You're getting {sleep_hrs}h - aim for 7-8h. Each additional hour improves memory retention by ~15%.")
         
-        # Low study hours + upcoming exam
-        if study_hrs and study_hrs < 3 and upcoming_exam:
-            recs.append(f"**URGENT: Time Management** - Only {study_hrs}h/day with an exam approaching. Use the **Pomodoro technique** (25min focus, 5min break) to maximize efficiency.")
-        
-        # Burnout risk
-        if study_hrs and study_hrs >= 8 and stress and stress >= 7:
-            recs.append("**⚠️ BURNOUT WARNING** - Studying 8+ hours with high stress is unsustainable. Take mandatory 1-hour breaks every 3 hours.")
-        
-        # Learning style adaptations
+        # Learning style specific recommendations
         if learning:
-            if learning == "visual" and category == "memory":
-                recs.append("**Visual Learning Strategy** - Use mind maps, color-coded notes, and the memory palace technique for your visual learning style.")
-            elif learning == "auditory" and category == "memory":
-                recs.append("**Auditory Learning Strategy** - Record yourself explaining concepts, use mnemonics, and study with discussion groups.")
-            elif learning == "kinesthetic":
-                recs.append(f"**Kinesthetic Learning Strategy** - Use physical flashcards, walk while reviewing, and create hands-on demonstrations for {category}.")
-            elif learning == "reading":
-                recs.append("**Reading/Writing Strategy** - Rewrite notes in your own words, create detailed outlines, and use written summaries.")
-        
-        # Optimal state encouragement
-        if sleep_hrs and sleep_hrs >= 7 and stress and stress <= 3:
-            recs.append("**✅ Excellent Conditions** - Your low stress and good sleep put you in an optimal learning state. Maximize this with active recall practice!")
+            learning_lower = learning.lower()
+            if "visual" in learning_lower:
+                if category == "memory":
+                    recs.append("**Visual Memory Mastery**: Create mind maps with colors. Use memory palace technique. Draw diagrams. Watch educational videos.")
+                elif category == "focus":
+                    recs.append("**Visual Focus Strategy**: Remove visual distractions. Use visual timers (Pomodoro). Study in organized, visually calm spaces.")
+                else:
+                    recs.append(f"**Visual Learning for {category}**: Use charts, diagrams, color-coding, and visual metaphors to understand concepts.")
+            
+            elif "auditory" in learning_lower:
+                if category == "memory":
+                    recs.append("**Auditory Memory Techniques**: Record lectures and replay. Teach concepts aloud. Create verbal mnemonics. Join study groups for discussion.")
+                elif category == "focus":
+                    recs.append("**Auditory Focus**: Use white noise or binaural beats. Explain concepts aloud while studying. Minimize auditory distractions.")
+                else:
+                    recs.append(f"**Auditory Learning for {category}**: Use podcasts, lectures, verbal explanations, and discussion-based learning.")
+            
+            elif "kinesthetic" in learning_lower:
+                if category == "memory":
+                    recs.append("**Kinesthetic Memory Methods**: Walk while reviewing flashcards. Use physical objects as memory aids. Act out concepts. Write by hand (not typing).")
+                elif category == "focus":
+                    recs.append("**Kinesthetic Focus**: Take movement breaks every 25 min. Use standing desk. Fidget tools for hands. Active note-taking.")
+                else:
+                    recs.append(f"**Kinesthetic Learning for {category}**: Use hands-on activities, physical models, role-playing, and movement-based learning.")
+            
+            elif "reading" in learning_lower or "writing" in learning_lower:
+                if category == "memory":
+                    recs.append("**Reading/Writing Memory**: Rewrite notes multiple times. Create detailed written summaries. Use Cornell note-taking method.")
+                elif category == "focus":
+                    recs.append("**Reading/Writing Focus**: Annotate heavily while reading. Take detailed written notes. Use bullet journaling for task management.")
+                else:
+                    recs.append(f"**Reading/Writing for {category}**: Use textbooks, written guides, detailed note-taking, and written self-explanations.")
         
         return recs
     
@@ -399,12 +557,16 @@ class StudyGuideExpert(KnowledgeEngine):
         return strengths.get(style, "various methods")
     
     def _calculate_confidence_adjustment(self, profile):
-        """Calculate confidence adjustment based on data completeness"""
+        """Calculate confidence adjustment based on data completeness and uncertainty"""
         adjustment = 0.0
         
         # More inputs = higher confidence
         input_count = sum(1 for v in profile.values() if v is not None)
         adjustment += input_count * 0.02  # +2% per input
+        
+        # Deduct for missing information
+        for _, penalty in self.uncertainty_factors:
+            adjustment -= penalty
         
         # Consistent patterns boost confidence
         if "optimal_learning_state" in self.inferred_facts:
@@ -414,41 +576,46 @@ class StudyGuideExpert(KnowledgeEngine):
         if "burnout_risk" in self.inferred_facts:
             adjustment -= 0.03
         
+        # Track confidence breakdown for transparency
+        self.confidence_breakdown = {
+            "base_inputs": input_count * 0.02,
+            "missing_data_penalty": -sum(p for _, p in self.uncertainty_factors),
+            "pattern_bonus": 0.05 if "optimal_learning_state" in self.inferred_facts else 0.0,
+            "risk_penalty": -0.03 if "burnout_risk" in self.inferred_facts else 0.0
+        }
+        
         return adjustment
     
-    
-    @Rule(AS.f << Fact(processed_query=MATCH.nlp), salience=5)
-    def reason(self, nlp):
-        """Legacy reasoning for backward compatibility with text-only queries"""
-        intents = nlp.get("intents", [])
-        if not intents:
-            self.response = {"concept": "General", "explanation": "I can help with memory, stress, time management, exams, motivation, confidence, and sleep."}
-            return
-        topic, conf = intents[0]
-        data = self.kb.get(topic, {})
-        if not data:
-            self.response = {"concept": "General"}
-            return
-        recs = []
-        conds = nlp.get("conditions", [])
-        for rule in data.get("rules", []):
-            if rule.get("condition") in conds or rule.get("condition") == "mentions_" + topic:
-                recs.append(rule["recommend"])
-                self.fired_rules.append(rule["id"])
-                self.confidence_scores.append(rule.get("confidence", 0.8))
-        self.response = {
-            "concept": data.get("concept", "Study Guide"),
-            "diagnosis": data.get("diagnosis", ""),
-            "explanation": data.get("explanation", ""),
-            "recommendation": "\n\n".join([f"{i+1}. {r}" for i, r in enumerate(recs[:4])]),
-            "examples": data.get("examples", []),
-            "resources": data.get("resources", []),
-            "confidence": max(self.confidence_scores) if self.confidence_scores else conf,
-            "reasoning_trace": self.reasoning_trace.copy(),
-            "fired_rules": self.fired_rules.copy(),
-            "inferred_facts": self.inferred_facts.copy(),
-            "topic": topic
+    def _generate_missing_info_suggestions(self):
+        """Generate suggestions for what additional information would improve recommendations"""
+        if not self.missing_info_warnings:
+            return []
+        
+        suggestions = []
+        missing_map = {
+            "study_hours": "📚 **Study Hours**: Knowing your daily study time would help tailor time management strategies.",
+            "stress_level": "😰 **Stress Level**: Your stress level would help identify mental health interventions needed.",
+            "learning_style": "🎨 **Learning Style**: Knowing your preferred learning style would enable personalized study techniques.",
+            "has_upcoming_exam": "📅 **Exam Timeline**: Whether you have an upcoming exam would adjust urgency of recommendations.",
+            "sleep_hours": "😴 **Sleep Hours**: Your sleep duration would help assess cognitive readiness and recovery needs."
         }
+        
+        for missing in self.missing_info_warnings:
+            if missing in missing_map:
+                suggestions.append(missing_map[missing])
+        
+        return suggestions
+    
+    def _generate_uncertainty_explanation(self, confidence):
+        """Generate human-readable explanation of uncertainty level"""
+        if confidence >= 0.90:
+            return "🟢 **High Confidence**: Comprehensive data provided. Recommendations are highly personalized and reliable."
+        elif confidence >= 0.80:
+            return "🟡 **Good Confidence**: Most key information provided. Recommendations are well-tailored but could be more precise with additional data."
+        elif confidence >= 0.70:
+            return "🟠 **Moderate Confidence**: Some key information missing. Recommendations are general and could be significantly improved with more data."
+        else:
+            return "🔴 **Low Confidence**: Limited information provided. Recommendations are based on category defaults. Please provide more details for personalized advice."
     
     def update_user_profile(self, **kwargs):
         self.user_profile.update(kwargs)

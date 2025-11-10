@@ -518,11 +518,6 @@ def study_guide_tab():
         category = st.selectbox("🎯 What area do you need help with?", list(CATEGORIES.keys()), 
                                 format_func=lambda x: CATEGORIES[x])
         
-        # Text question
-        question = st.text_area("❓ Describe your specific concern or question:", 
-                                placeholder="e.g., I struggle to remember what I studied yesterday...",
-                                height=100)
-        
         # Learning style
         learning_style = st.selectbox("🎨 What's your preferred learning style?",
                                       ["Not sure", "Visual", "Auditory", "Kinesthetic", "Reading/Writing"])
@@ -555,88 +550,27 @@ def study_guide_tab():
     
     st.markdown("---")
     
-    # Quick preset buttons
-    st.markdown("**Quick Scenarios:**")
-    preset_cols = st.columns(4)
-    
-    preset_clicked = None
-    if preset_cols[0].button("😰 High Stress", use_container_width=True):
-        preset_clicked = "stress"
-    if preset_cols[1].button("😴 Sleep Issues", use_container_width=True):
-        preset_clicked = "sleep"
-    if preset_cols[2].button("📚 Exam Prep", use_container_width=True):
-        preset_clicked = "exam"
-    if preset_cols[3].button("🎯 Focus Problems", use_container_width=True):
-        preset_clicked = "focus"
-    
-    # Apply presets
-    if preset_clicked == "stress":
-        category, stress_level, study_hours = "Stress", 9, 5
-        question = "I feel overwhelmed and anxious about my studies"
-    elif preset_clicked == "sleep":
-        category, sleep_hours, stress_level = "Sleep", 5, 7
-        question = "I'm not getting enough sleep and it's affecting my memory"
-    elif preset_clicked == "exam":
-        category, has_upcoming_exam, stress_level = "Exam Preparation", True, 8
-        question = "I have an exam next week and I'm not prepared"
-    elif preset_clicked == "focus":
-        category, stress_level, study_hours = "Focus", 6, 3
-        question = "I can't concentrate when I study"
-    
-    st.markdown("---")
+    # Default question based on category
+    question = f"I need help with {category.lower()}"
 
     # Get Advice button
     if st.button("🔍 Get Personalized Advice", type="primary", use_container_width=True):
-        if not question or len(question.strip()) < 10:
-            st.warning("⚠️ Please provide a more detailed question (at least 10 characters)")
-        else:
-            with st.spinner("🤔 Analyzing your situation with advanced rule-based reasoning..."):
-                # Use the new multi-input method
-                response = study_expert.process_query_with_inputs(
-                    category=category,
-                    question=question,
-                    study_hours=study_hours,
-                    stress_level=stress_level,
-                    learning_style=learning_style,
-                    has_upcoming_exam=has_upcoming_exam,
-                    sleep_hours=sleep_hours
-                )
-                
-                if response:
-                    display_study_guide_response(response)
-                else:
-                    st.error("❌ Unable to generate recommendations. Please try again.")
-    
-    # Legacy simple interface (collapsible)
-    with st.expander("📖 Simple Mode (Text-only questions)", expanded=False):
-        st.markdown("*Use this if you prefer quick text-based queries*")
-        
-        SIMPLE_CATEGORIES = {
-            'Study Techniques': [
-                'How can I improve my memory?',
-                'What are active learning methods?',
-                'How do I make effective notes?'
-            ],
-            'Wellness': [
-                "I feel anxious about exams",
-                "I'm feeling overwhelmed with studies",
-                "I can't sleep well during exam time"
-            ],
-            'Motivation': [
-                "I keep procrastinating",
-                "I've lost my motivation to study",
-                'How to build study confidence'
-            ]
-        }
-        
-        simple_cat = st.selectbox("Category", list(SIMPLE_CATEGORIES.keys()), key="simple_cat")
-        simple_q = st.selectbox("Question", SIMPLE_CATEGORIES[simple_cat], key="simple_q")
-        
-        if st.button("Get Quick Advice", key="simple_btn"):
-            with st.spinner("🤔 Consulting the study guide..."):
-                response = study_expert.process_query(simple_q)
-                if response:
-                    display_study_guide_response(response)
+        with st.spinner("🤔 Analyzing your situation with advanced rule-based reasoning..."):
+            # Use the new multi-input method
+            response = study_expert.process_query_with_inputs(
+                category=category,
+                question=question,
+                study_hours=study_hours,
+                stress_level=stress_level,
+                learning_style=learning_style,
+                has_upcoming_exam=has_upcoming_exam,
+                sleep_hours=sleep_hours
+            )
+            
+            if response:
+                display_study_guide_response(response)
+            else:
+                st.error("❌ Unable to generate recommendations. Please try again.")
 
 def display_study_guide_response(response):
     """Display study guide response with proper formatting."""
@@ -660,9 +594,30 @@ def display_study_guide_response(response):
                 if profile.get('has_upcoming_exam'):
                     st.warning("📅 **Upcoming Exam:** Yes - using time-sensitive strategies")
         
-        # Display confidence score
+        # Display uncertainty explanation (prominent)
+        if response.get('uncertainty_explanation'):
+            st.markdown(response['uncertainty_explanation'])
+        
+        # Display confidence score with breakdown
         if response.get('confidence'):
-            st.info(f"💯 **Confidence:** {response['confidence']:.0%}")
+            conf_col1, conf_col2 = st.columns([1, 2])
+            with conf_col1:
+                st.metric("💯 Confidence", f"{response['confidence']:.0%}")
+            with conf_col2:
+                if response.get('confidence_breakdown'):
+                    breakdown = response['confidence_breakdown']
+                    with st.expander("� Confidence Breakdown"):
+                        st.markdown(f"**Base Inputs:** +{breakdown.get('base_inputs', 0)*100:.0f}%")
+                        st.markdown(f"**Missing Data Penalty:** {breakdown.get('missing_data_penalty', 0)*100:.0f}%")
+                        st.markdown(f"**Pattern Bonus:** +{breakdown.get('pattern_bonus', 0)*100:.0f}%")
+                        st.markdown(f"**Risk Penalty:** {breakdown.get('risk_penalty', 0)*100:.0f}%")
+        
+        # Display missing information warnings
+        if response.get('missing_info_suggestions') and len(response['missing_info_suggestions']) > 0:
+            with st.expander("💡 Improve Recommendations by Providing", expanded=True):
+                st.markdown("**Adding this information would significantly improve recommendation quality:**")
+                for suggestion in response['missing_info_suggestions']:
+                    st.markdown(f"• {suggestion}")
         
         # Display concept/diagnosis
         if response.get('concept'):

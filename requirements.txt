@@ -6,5 +6,6 @@ experta==1.9.4
 streamlit==1.31.0
 
 # Phase 2+3: Multi-Agent System + LLM Integration
-google-generativeai>=0.3.0
+openai>=1.0.0
 python-dotenv>=1.0.0
+# google-generativeai>=0.3.0  # Commented out - now using OpenAI

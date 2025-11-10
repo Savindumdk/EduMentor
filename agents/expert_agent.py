@@ -3,10 +3,10 @@ Expert Agent
 ------------
 Main agent that coordinates subject expert systems (Biology, Physics, Chemistry).
 Study Guide is now a standalone system in a separate tab.
-Uses Gemini LLM to understand queries and select appropriate expert tools.
+Uses OpenAI LLM to understand queries and select appropriate expert tools.
 """
 
-import google.generativeai as genai
+from openai import OpenAI
 from typing import Dict, Any, List
 import os
 from dotenv import load_dotenv
@@ -34,13 +34,13 @@ class ExpertAgent:
     
     def __init__(self):
         """Initialize the Expert Agent with subject expert tools."""
-        # Initialize Gemini
-        api_key = os.getenv('GEMINI_API_KEY')
+        # Initialize OpenAI
+        api_key = os.getenv('OPENAI_API_KEY')
         if not api_key:
-            raise ValueError("GEMINI_API_KEY not found in environment variables")
+            raise ValueError("OPENAI_API_KEY not found in environment variables")
         
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        self.client = OpenAI(api_key=api_key)
+        self.model = "gpt-4o-mini"  # Using GPT-4o-mini for cost efficiency
         
         # Initialize subject expert system tools (Study Guide moved to separate tab)
         self.tools = {
@@ -245,8 +245,16 @@ TOPIC: chemical_process__digestion_
 REASONING: The query asks about digestive "processes" (plural), which includes both mechanical and chemical digestion. Selected all three most relevant topics to provide comprehensive answer."""
 
         try:
-            response = self.model.generate_content(prompt)
-            text = response.text.strip()
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are an expert system coordinator for an O/L tutoring system."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=500
+            )
+            text = response.choices[0].message.content.strip()
             
             # Parse response - NOW SUPPORTS MULTIPLE TOPICS
             lines = text.split('\n')
@@ -411,8 +419,16 @@ Create a clear, natural response that:
 Keep it concise (3-4 paragraphs max)."""
 
         try:
-            response = self.model.generate_content(prompt)
-            enhanced = response.text.strip()
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a friendly O/L tutor helping students understand concepts."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=800
+            )
+            enhanced = response.choices[0].message.content.strip()
             
             # Add attribution
             return f"{enhanced}\n\n---\n*Source: {topic} Expert System*"
@@ -489,8 +505,16 @@ IMPORTANT: Don't just list the concepts separately - INTEGRATE them into a unifi
 Keep it well-structured but concise (4-6 paragraphs or use sections)."""
 
         try:
-            response = self.model.generate_content(prompt)
-            synthesized = response.text.strip()
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are an O/L tutor skilled at synthesizing complex information into clear, integrated explanations."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=1200
+            )
+            synthesized = response.choices[0].message.content.strip()
             
             # Add metadata
             topic_str = ', '.join(topics) if topics else tool_used.replace('_', ' ').title()
