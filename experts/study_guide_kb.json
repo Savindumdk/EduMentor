@@ -1,0 +1,696 @@
+{
+  "memory": {
+    "keywords": ["memory", "remember", "recall", "memorize", "forget", "retention", "spaced repetition", "memory palace"],
+    "concept": "🧠 Memory Enhancement Techniques",
+    "diagnosis": "You need scientifically-proven memory techniques to transform how you learn and retain information",
+    "confidence": 0.9,
+    "rules": [
+      {
+        "id": "memory_001",
+        "condition": "mentions_memory",
+        "recommend": "Use spaced repetition (Day 1, 3, 7, 14, 30) - scientifically proven to increase retention by 200%",
+        "confidence": 0.95,
+        "priority": 1
+      },
+      {
+        "id": "memory_002",
+        "condition": "mentions_memory",
+        "recommend": "Practice active recall - test yourself instead of re-reading. Research shows 3x better retention than passive review",
+        "confidence": 0.92,
+        "priority": 2
+      },
+      {
+        "id": "memory_003",
+        "condition": "low_sleep",
+        "recommend": "Improve sleep to 7-8 hours for better memory consolidation. Each hour of sleep improves retention by 15%",
+        "confidence": 0.85,
+        "priority": 3
+      },
+      {
+        "id": "memory_004",
+        "condition": "visual_learner",
+        "recommend": "Use the Memory Palace technique (method of loci) - visualize walking through familiar locations and placing concepts in specific spots",
+        "confidence": 0.88,
+        "priority": 2
+      },
+      {
+        "id": "memory_005",
+        "condition": "high_stress",
+        "recommend": "Practice mindful encoding - stress hormones impair hippocampus function. Take 5 deep breaths before studying new material",
+        "confidence": 0.83,
+        "priority": 4
+      },
+      {
+        "id": "memory_006",
+        "condition": "exam_approaching",
+        "recommend": "Use retrieval practice daily - take practice tests without notes. Retrieval strengthens memory more than re-studying",
+        "confidence": 0.91,
+        "priority": 2
+      }
+    ],
+    "explanation": "Memory works in 3 stages: Encoding (learning), Storage (maintaining), and Retrieval (recalling). The hippocampus processes new memories, then transfers them to neocortex for long-term storage during sleep. Spaced repetition exploits the 'spacing effect' - memories get stronger each time you successfully retrieve them with increasing intervals. Active recall forces your brain to reconstruct information, strengthening neural pathways. Emotion and visualization create stronger memory traces than abstract concepts alone.",
+    "examples": [
+      "**Spaced Repetition Schedule**: Study topic on Day 1, review Day 2 (+1 day), Day 4 (+2 days), Day 7 (+3 days), Day 14 (+7 days), Day 30 (+16 days)",
+      "**Active Recall Practice**: After reading a paragraph, close the book and write what you remember. Check accuracy. Repeat with missed parts",
+      "**Memory Palace for Biology**: Visualize your house. Place 'mitochondria' in kitchen (energy center), 'nucleus' in office (control center), 'ribosomes' in factory garage (protein production)",
+      "**Feynman Technique**: Teach the concept to a 10-year-old. If you struggle, you don't understand it yet. Simplify until fluent",
+      "**Mnemonic Example (Planets)**: 'My Very Educated Mother Just Served Us Nachos' = Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune",
+      "**Dual Coding**: While reading about photosynthesis, draw the process. Combining words + images doubles retention",
+      "**Elaborative Interrogation**: Don't just memorize 'mitochondria makes ATP'. Ask WHY it's called powerhouse, HOW ATP is made, WHEN cells need more",
+      "**Interleaving**: Instead of studying Chapter 1 fully then Chapter 2, mix topics: 1A, 2A, 3A, 1B, 2B, 3B. Brain learns to discriminate better"
+    ],
+    "resources": [
+      "**Apps**: Anki (free, powerful SRS), Quizlet (user-friendly flashcards), RemNote (combines notes + SRS), Memrise (gamified learning)",
+      "**Books**: 'Make It Stick' (Brown et al.) - science of learning; 'Moonwalking with Einstein' (Foer) - memory techniques; 'How We Learn' (Carey)",
+      "**Courses**: Coursera 'Learning How to Learn' (Dr. Oakley) - most popular course ever; 'Memory and the Human Lifespan' (Great Courses)",
+      "**YouTube Channels**: Memory Palace (Nelson Dellis), Memorize Academy, The Art of Memory",
+      "**Websites**: SuperMemo.com (original SRS research), Gwern.net/Spaced-repetition (deep dive into science)",
+      "**Podcasts**: Huberman Lab #72 on memory optimization, Learning Scientists podcast",
+      "**Scientific Papers**: Roediger & Karpicke (2006) on testing effect, Cepeda et al. (2006) on spacing effect meta-analysis"
+    ]
+  },
+  "stress": {
+    "keywords": ["stress", "anxious", "anxiety", "nervous", "panic", "worried", "overwhelm", "pressure"],
+    "concept": "🧘 Stress & Anxiety Management",
+    "diagnosis": "You are experiencing exam-related stress - affects 60-70% of students. This is manageable with evidence-based techniques",
+    "confidence": 0.88,
+    "rules": [
+      {
+        "id": "stress_001",
+        "condition": "high_stress",
+        "recommend": "Practice 4-7-8 breathing: Inhale 4 sec, Hold 7 sec, Exhale 8 sec. Activates parasympathetic nervous system in 2 minutes",
+        "confidence": 0.90,
+        "priority": 1,
+        "triggers": ["low_focus"]
+      },
+      {
+        "id": "stress_002",
+        "condition": "high_stress",
+        "recommend": "Use grounding technique (5-4-3-2-1): 5 things you see, 4 you touch, 3 you hear, 2 you smell, 1 you taste. Interrupts panic loops",
+        "confidence": 0.85,
+        "priority": 2
+      },
+      {
+        "id": "stress_003",
+        "condition": "exam_anxiety",
+        "recommend": "Practice past papers under timed conditions to reduce fear of unknown. Exposure therapy reduces anxiety by 40-60%",
+        "confidence": 0.88,
+        "priority": 3
+      },
+      {
+        "id": "stress_004",
+        "condition": "high_stress",
+        "recommend": "Regular exercise (30 min, 3x/week) reduces cortisol by 25-30% naturally. Even walking helps significantly",
+        "confidence": 0.82,
+        "priority": 4
+      },
+      {
+        "id": "stress_005",
+        "condition": "high_stress",
+        "recommend": "Progressive Muscle Relaxation (PMR): Tense and release muscle groups systematically. Reduces physical tension in 15 minutes",
+        "confidence": 0.86,
+        "priority": 3
+      },
+      {
+        "id": "stress_006",
+        "condition": "sleep_deprived",
+        "recommend": "Prioritize 7-8 hours sleep - sleep deprivation amplifies stress response by 60%. One good night reduces cortisol significantly",
+        "confidence": 0.89,
+        "priority": 2
+      },
+      {
+        "id": "stress_007",
+        "condition": "catastrophizing",
+        "recommend": "Challenge catastrophic thoughts: Ask 'What's the evidence?', 'What's the worst that could happen?', 'Will this matter in 5 years?'",
+        "confidence": 0.84,
+        "priority": 4
+      }
+    ],
+    "explanation": "Stress triggers your amygdala (fear center), activating fight-or-flight response: increased heart rate, cortisol release, rapid breathing, muscle tension, and shutdown of prefrontal cortex (rational thinking). This is designed for physical threats, not exams! Chronic stress shrinks hippocampus (memory center) and weakens immune system. The good news: stress response can be reversed through breathing (activates vagus nerve), grounding (engages prefrontal cortex), and movement (burns stress hormones). Moderate stress enhances performance (Yerkes-Dodson law), but high stress impairs it.",
+    "examples": [
+      "**4-7-8 Breathing Protocol**: Sit comfortably, exhale completely. Inhale through nose (count 4), hold (count 7), exhale through mouth (count 8). Repeat 4 cycles. Do before exams, studying, or when anxious",
+      "**5-4-3-2-1 Grounding During Panic**: Name 5 things you see (desk, pen, window, poster, chair), 4 you touch (fabric, cold desk, smooth phone, rough carpet), 3 you hear (clock, AC, voices), 2 you smell (coffee, fresh air), 1 you taste (mint, water)",
+      "**PMR Sequence**: Tense fists 5 sec → release 10 sec. Biceps → shoulders → forehead → jaw → chest → stomach → glutes → thighs → calves → feet. Notice the contrast between tension and relaxation",
+      "**Timed Practice Sessions**: Simulate exam conditions - use timer, no notes, quiet room. First session will spike anxiety, but by 3rd session anxiety drops 50%",
+      "**Morning Anti-Stress Routine**: Wake → 5 min breathing → 10 min walk outside (sunlight reduces cortisol) → healthy breakfast → review goals calmly",
+      "**Cognitive Reframing**: Instead of 'I'll fail this exam', try 'I've studied and I'm prepared. One exam doesn't define me. I'll do my best'",
+      "**Scheduled Worry Time**: Set aside 15 min daily to worry intensely. Outside this time, postpone worries. Trains brain to not ruminate constantly",
+      "**Social Support Protocol**: Talk to friend/family for 10 min. Social connection releases oxytocin which counteracts cortisol"
+    ],
+    "resources": [
+      "**Apps**: Headspace (meditation, $), Calm (sleep stories, $), Insight Timer (free meditation), Breathwrk (breathing exercises), Sanvello (CBT tools)",
+      "**Books**: 'The Anxiety and Phobia Workbook' (Bourne), 'Why Zebras Don't Get Ulcers' (Sapolsky), 'Feeling Good' (Burns - CBT techniques)",
+      "**YouTube**: The Honest Guys (guided relaxation), Yoga with Adriene (stress-relief yoga), Therapy in a Nutshell (anxiety education)",
+      "**Courses**: Yale 'The Science of Well-Being' (free), 'The Anxiety Course' by The Anxiety Guy",
+      "**Websites**: AnxietyCanada.com (free CBT resources), MindTools.com (stress management), HelpGuide.org",
+      "**Crisis Support**: National Suicide Prevention Lifeline (988), Crisis Text Line (text HOME to 741741), Your university counseling center",
+      "**Research-Backed**: ACT (Acceptance Commitment Therapy), CBT (Cognitive Behavioral Therapy), MBSR (Mindfulness-Based Stress Reduction)"
+    ]
+  },
+  "procrastination": {
+    "keywords": ["procrastinate", "procrastinating", "delay", "distracted", "avoid", "lazy", "can't start"],
+    "concept": "🚀 Overcoming Procrastination",
+    "diagnosis": "You're stuck in avoidance mode. Procrastination is an EMOTION regulation problem, not a time management problem",
+    "confidence": 0.87,
+    "rules": [
+      {
+        "id": "procrastination_001",
+        "condition": "procrastinating",
+        "recommend": "2-minute rule: If task can be started in <2 minutes, do it NOW. Breaks inertia and builds momentum",
+        "confidence": 0.91,
+        "priority": 1
+      },
+      {
+        "id": "procrastination_002",
+        "condition": "task_aversion",
+        "recommend": "Break into micro-tasks: Don't 'write essay' (overwhelming). Instead: '1) Open doc, 2) Write thesis, 3) Find 2 sources'. Each <10 min",
+        "confidence": 0.89,
+        "priority": 1
+      },
+      {
+        "id": "procrastination_003",
+        "condition": "perfectionism",
+        "recommend": "5-minute rule: Commit to just 5 minutes. Usually continue past 5. Starting is the hardest part (activation energy)",
+        "confidence": 0.88,
+        "priority": 2
+      },
+      {
+        "id": "procrastination_004",
+        "condition": "fear_of_failure",
+        "recommend": "Separate your identity from outcomes. You're not your grades. Fear of failure = avoidance. 'Fail faster' mindset: more attempts = more learning",
+        "confidence": 0.86,
+        "priority": 3
+      },
+      {
+        "id": "procrastination_005",
+        "condition": "no_accountability",
+        "recommend": "Create external commitment: Study group, accountability partner, public declaration. Social pressure increases follow-through 65%",
+        "confidence": 0.85,
+        "priority": 2
+      },
+      {
+        "id": "procrastination_006",
+        "condition": "unclear_task",
+        "recommend": "Implementation intention: Don't say 'I'll study later'. Say 'At 2pm in library I will do problem set #3'. Specific = 2-3x completion rate",
+        "confidence": 0.90,
+        "priority": 1
+      },
+      {
+        "id": "procrastination_007",
+        "condition": "chronic_procrastination",
+        "recommend": "Identify your procrastination type: Perfectionist (lower standards), Dreamer (add structure), Worrier (exposure therapy), Defier (find autonomy). Different types need different solutions",
+        "confidence": 0.84,
+        "priority": 3
+      }
+    ],
+    "explanation": "Procrastination is NOT laziness. Research shows it's emotion regulation failure: we procrastinate to avoid negative feelings (anxiety, self-doubt, boredom). Brain seeks immediate mood repair (social media) over long-term goals. Prefrontal cortex (rational planning) vs. limbic system (immediate gratification) - limbic often wins. Procrastination creates MORE anxiety (guilt + looming deadline), creating vicious cycle. Task aversion has specific causes: 1) Task too vague ('study biology' - what exactly?), 2) Too large (feels impossible), 3) Unpleasant (boring/hard), 4) Fear of failure (if I don't try, I didn't really fail), 5) Perfectionism (can't start until conditions perfect). Solution isn't willpower - it's engineering environment and shrinking task size. Zeigarnik Effect: brain obsesses over incomplete tasks, so starting (even tiny start) reduces mental burden. Implementation intentions work: 'If X situation, then Y action' creates automatic trigger.",
+    "examples": [
+      "**2-Minute Rule**: Don't think 'I'll write essay later'. Think 'I'll open Google Docs NOW' (<2 min). Once open, momentum builds. Opening doc → Looking at prompt → Writing thesis → Before you know it, 30 min passed",
+      "**Micro-Task Breakdown**: WRONG: 'Study for Chemistry exam' (vague, huge, scary). RIGHT: '1) Open textbook page 42 (30 sec), 2) Read first paragraph (2 min), 3) Highlight key terms (3 min), 4) Create 3 flashcards (5 min)'. Each step is non-threatening",
+      "**5-Minute Commitment**: Tell yourself: 'I'll just work on this for 5 minutes, then I can quit'. Set timer. 90% of time you'll continue past 5 min. Starting is hardest part (activation energy). Once started, inertia works FOR you",
+      "**Implementation Intention**: BAD: 'I should exercise more'. GOOD: 'After I pour my morning coffee (trigger), I will do 10 pushups in the kitchen (behavior)'. Specific situation + specific action = 2-3x follow-through",
+      "**Accountability Partnership**: Text friend: 'By 3pm today I'll complete Math homework. If I don't, I'll send you $10'. Social pressure + financial cost = powerful motivator. Or use Beeminder app (charges money for missed goals)",
+      "**Procrastination Surfing**: When urge to procrastinate hits, pause. Notice the feeling (anxiety? boredom? frustration?). Acknowledge: 'I'm feeling anxious about this essay'. Then: 'I'll do 1 tiny thing' (2-minute rule). Surfing the urge instead of reacting",
+      "**Environment Design**: Remove friction for good behavior: Put textbooks on desk before bed. Add friction for procrastination: Put phone in another room, use app blockers. Make good choices easier than bad choices",
+      "**Past Self / Future Self**: When procrastinating, ask: 'Am I screwing over Future Me?' Future Me (tomorrow at midnight) will hate Present Me for procrastinating. Be kind to Future You"
+    ],
+    "resources": [
+      "**Apps**: Forest (gamified focus, $3), Freedom (website blocker, $40/yr), Cold Turkey (nuclear option blocker, free), Beeminder (accountability with money, free), FocusMate (virtual coworking, free)",
+      "**Books**: 'The Procrastination Equation' (Piers Steel - scientific), 'Atomic Habits' (James Clear - habit systems), 'Solving the Procrastination Puzzle' (Timothy Pychyl - short, practical), 'Eat That Frog' (Brian Tracy - prioritization)",
+      "**YouTube**: How to ADHD (procrastination strategies), Thomas Frank (productivity systems), Ali Abdaal (evidence-based study advice)",
+      "**Techniques**: 2-minute rule, 5-minute rule, Pomodoro, Implementation intentions, Temptation bundling (only listen to favorite podcast WHILE studying), Self-compassion (beating yourself up makes it worse)",
+      "**Research**: Tim Pychyl (procrastination psychology), Piers Steel (procrastination equation: Motivation = Expectancy × Value / Impulsiveness × Delay), Joseph Ferrari (procrastination types)",
+      "**Therapy**: If chronic, consider CBT (Cognitive Behavioral Therapy) for procrastination. Many university counseling centers offer this",
+      "**Subreddits**: r/getdisciplined, r/DecidingToBeBetter, r/NonZeroDay (do at least 1 thing daily)",
+      "**Emergency Help**: If procrastination stems from depression/ADHD/anxiety, see university counseling. Untreated mental health makes procrastination worse"
+    ]
+  },
+  "time_management": {
+    "keywords": ["time management", "schedule", "plan", "organize", "prioritize", "time", "manage time"],
+    "concept": "⏰ Effective Time Management",
+    "diagnosis": "You need a structured study system with clear priorities. Most students confuse being BUSY with being PRODUCTIVE",
+    "confidence": 0.86,
+    "rules": [
+      {
+        "id": "time_001",
+        "condition": "poor_time_management",
+        "recommend": "Use time blocking: Assign specific time slots to specific subjects. Eliminates decision fatigue and increases focus 40%",
+        "confidence": 0.90,
+        "priority": 1
+      },
+      {
+        "id": "time_002",
+        "condition": "poor_time_management",
+        "recommend": "Apply Eisenhower Matrix: Urgent+Important = Do now, Important only = Schedule, Urgent only = Delegate/minimize, Neither = Eliminate",
+        "confidence": 0.87,
+        "priority": 2
+      },
+      {
+        "id": "time_003",
+        "condition": "poor_time_management",
+        "recommend": "Weekly review: Plan each Sunday for the week ahead. 30 minutes planning saves 5+ hours execution time",
+        "confidence": 0.85,
+        "priority": 3
+      },
+      {
+        "id": "time_004",
+        "condition": "energy_management",
+        "recommend": "Do hardest subjects when energy is highest (usually morning). Cognitive performance varies 20% throughout day - match tasks to energy",
+        "confidence": 0.83,
+        "priority": 4
+      },
+      {
+        "id": "time_005",
+        "condition": "overwhelming_workload",
+        "recommend": "Use MIT method (Most Important Tasks): Identify 3 must-do tasks daily. Complete these before anything else. 80/20 rule in action",
+        "confidence": 0.88,
+        "priority": 2
+      },
+      {
+        "id": "time_006",
+        "condition": "perfectionism",
+        "recommend": "Set time limits per task. Parkinson's Law: work expands to fill available time. Perfect is the enemy of done",
+        "confidence": 0.84,
+        "priority": 3
+      }
+    ],
+    "explanation": "Time management = Priority management. Everyone has 24 hours, but successful students spend time on high-value activities. Pareto Principle (80/20 rule): 20% of your study activities generate 80% of results. Common time-wasters: perfectionism (diminishing returns after 'good enough'), multitasking (40% productivity loss), reactive mode (responding to urgent instead of planning important), social media (average 3+ hrs daily for students). Energy management > time management: cognitive performance follows ultradian rhythms (90-120 min cycles). Decision fatigue is real: use systems to automate choices. Time blocking works by creating 'implementation intentions' - pre-deciding when/where tasks happen doubles completion rate.",
+    "examples": [
+      "**Time Blocking Template**: 6-7am = Wake/exercise, 7-8am = Breakfast/review notes, 8-11am = Deep work block 1 (hardest subject), 11-12pm = Shallow work (email/admin), 12-1pm = Lunch/break, 1-2pm = Exercise/nap, 2-5pm = Deep work block 2 (medium difficulty), 5-6pm = Errands/shallow work, 6-7pm = Dinner, 7-9pm = Study block 3 (lighter review), 9-11pm = Personal time/wind down",
+      "**Eisenhower Matrix in Action**: Urgent + Important (exam tomorrow) = Do now. Important only (long-term project) = Schedule specific time. Urgent only (friend needs notes) = Quick help but protect priorities. Neither (social media scrolling) = Eliminate",
+      "**Weekly Planning Ritual**: Sunday 5pm: 1) Review last week (what worked/didn't), 2) Check all syllabi/deadlines, 3) Identify top 3 priorities this week, 4) Block time for each on calendar, 5) Prepare materials needed, 6) Schedule review time. Takes 30 min, saves hours of 'what should I do now?'",
+      "**Daily MIT Practice**: Every morning, write 3 MITs: 'Today I MUST complete: 1) Math problem set #5, 2) Biology lab report draft, 3) Read Chapters 8-9'. Do these before checking email/social. If day gets chaotic, at least MITs are done",
+      "**Energy Matching**: Peak energy (9am-11am) = Hardest cognitive work (problem-solving, complex reading). Medium energy (2-4pm) = Moderate tasks (writing drafts, organizing notes). Low energy (after 8pm) = Easy tasks (flashcard review, planning tomorrow)",
+      "**Pomodoro Scheduling**: Block day into pomodoros. 8am = 2 pomodoros Math (1hr total), 9am = 1 pomodoro break/snack, 9:30am = 4 pomodoros Chemistry (2hrs), etc. Gamifies day and creates natural breaks",
+      "**Batching Similar Tasks**: Instead of checking email every 30 min (context switching), batch: 9am, 1pm, 5pm only. Instead of organizing notes daily, batch weekly. Batching reduces cognitive load 30%",
+      "**Time Audit**: Track ALL activities for 3 days (RescueTime app or manual). Calculate: actual study time vs. intended, time-wasters (social media, YouTube), energy patterns. Most students overestimate study time by 50%"
+    ],
+    "resources": [
+      "**Apps**: Google Calendar (time blocking, free), Notion (all-in-one planner, free), Todoist (task management, free tier), RescueTime (time tracking, free), Focus@Will (productivity music, $)",
+      "**Books**: 'Deep Work' (Cal Newport - essential), 'Getting Things Done' (David Allen - comprehensive), 'The One Thing' (Keller - simplicity), '168 Hours' (Laura Vanderkam - time abundance)",
+      "**Methods**: Time blocking, Pomodoro Technique, Eisenhower Matrix, MIT method, Time batching, Eat the Frog (hardest task first), 2-minute rule (if <2min, do immediately)",
+      "**Templates**: Google 'student schedule template', Notion student template gallery, bullet journal spread ideas, weekly planner PDFs",
+      "**YouTube**: Thomas Frank (time management systems), Ali Abdaal (productivity), Matt D'Avella (minimalist productivity), Elizabeth Filips (study strategies)",
+      "**Courses**: Coursera 'Work Smarter, Not Harder', LinkedIn Learning 'Time Management Fundamentals'",
+      "**Communities**: Reddit r/productivity, r/GetStudying, r/TimeManagement, Notion student communities",
+      "**Research**: David Allen (GTD), Cal Newport (Deep Work philosophy), Laura Vanderkam (time perception), Gloria Mark (context-switching costs)"
+    ]
+  },
+  "exam_prep": {
+    "keywords": ["exam", "test", "preparation", "prepare", "night before", "cramming", "exam day"],
+    "concept": "📝 Exam Preparation Strategy",
+    "diagnosis": "You need a strategic, timeline-based exam prep plan. Most students over-rely on re-reading (least effective method)",
+    "confidence": 0.89,
+    "rules": [
+      {
+        "id": "exam_001",
+        "condition": "exam_coming",
+        "recommend": "Practice past papers under timed conditions (most effective prep). Retrieval practice improves performance 50% more than re-studying",
+        "confidence": 0.94,
+        "priority": 1
+      },
+      {
+        "id": "exam_002",
+        "condition": "one_week_before",
+        "recommend": "Focus on high-weightage topics (80/20 rule). Analyze past papers to identify patterns - 80% of questions come from 20% of content",
+        "confidence": 0.91,
+        "priority": 2
+      },
+      {
+        "id": "exam_003",
+        "condition": "night_before",
+        "recommend": "Light review only, no new material - sleep by 10pm. Sleep consolidates memories and improves recall by 40%",
+        "confidence": 0.88,
+        "priority": 3
+      },
+      {
+        "id": "exam_004",
+        "condition": "exam_day",
+        "recommend": "Arrive 20 min early, do breathing exercises, avoid anxious students. First 5 min: read ALL questions, plan attack strategy",
+        "confidence": 0.86,
+        "priority": 4
+      },
+      {
+        "id": "exam_005",
+        "condition": "one_month_before",
+        "recommend": "Create study schedule with daily topics. Study for understanding first, then memorization. Distribute practice over time (spacing effect)",
+        "confidence": 0.87,
+        "priority": 2
+      },
+      {
+        "id": "exam_006",
+        "condition": "cramming",
+        "recommend": "If must cram: focus on past papers, summaries, and practice questions. Sleep 6 hours minimum - all-nighters reduce performance 40%",
+        "confidence": 0.79,
+        "priority": 3
+      }
+    ],
+    "explanation": "Exam success = (Understanding × Retrieval Practice × Exam Strategy) / Anxiety. Most students spend 80% time re-reading (recognition memory) when they should practice recall (harder but 300% more effective). Spacing effect: distributed practice over weeks beats massed practice (cramming). Testing effect: self-testing is learning, not just assessment. Sleep consolidates declarative memories (facts) during slow-wave sleep and procedural memories (skills) during REM. Exam day performance depends on: preparation (70%), anxiety management (20%), and strategy (10%). Timeline matters: 3 months = build understanding + spaced practice, 1 month = intensive review + practice papers, 1 week = polish + retrieval practice, 1 day = light review + mental prep.",
+    "examples": [
+      "**3-Month Timeline**: Month 1 = Attend lectures, take Cornell notes, review same day. Month 2 = Create flashcards, mind maps, start practice questions. Month 3 = Daily practice papers, group study, identify weak areas",
+      "**1-Week Intensive**: Day 7 = Review all notes, identify gaps. Day 6 = Focus on weak topics. Day 5 = First full practice paper (timed). Day 4 = Review mistakes, study missed concepts. Day 3 = Second practice paper. Day 2 = Third practice paper + final weak spot review. Day 1 = Light review, prepare materials, sleep 8+ hrs",
+      "**Past Paper Strategy**: 1) Attempt full paper under exam conditions (no notes, timed), 2) Mark honestly using rubric, 3) Analyze errors: knowledge gap? misread question? time pressure?, 4) Study missed concepts deeply, 5) Re-attempt similar questions, 6) Repeat with new paper",
+      "**80/20 Analysis**: Collect 5 past papers. Categorize each question by topic. Calculate frequency. If 'Integration' appears in 40% of questions, it's 20% of content generating 40% of marks - prioritize!",
+      "**Night Before Routine**: 6pm = Light review of summary sheets (no new material). 7pm = Prepare: pens, calculator, ID, water bottle. 8pm = Relaxing activity (walk, music, light reading). 9pm = Shower, lay out clothes. 9:30pm = Bed with reading (non-academic). 10pm = Lights out. No screens!",
+      "**Exam Day Protocol**: Wake 2hrs before exam. High-protein breakfast (eggs, not sugar). Arrive 20 min early. Bathroom first. Find seat. 3 rounds 4-7-8 breathing. When exam starts: Read ALL questions first (2 min), mark easy ones, plan time allocation, start with easiest question (confidence builder)",
+      "**During Exam**: If stuck, move on immediately (mark for return). Watch clock every 15 min. Leave 10 min end for review. If mind blanks, take 3 deep breaths, visualize your notes, write anything related - often triggers recall",
+      "**Post-Exam**: DON'T discuss with anxious peers immediately. Take 15 min alone to decompress. Then celebrate effort regardless of outcome. Learn from mistakes when results come, but don't ruminate on exam day"
+    ],
+    "resources": [
+      "**Essential**: Your institution's past exam papers + marking schemes (most valuable resource!), Lecturer's office hours (clarify expectations)",
+      "**Study Techniques**: 'Make It Stick' (proven study methods), 'A Mind for Numbers' (exam strategies), 'How to Become a Straight-A Student' (Cal Newport)",
+      "**Practice Platforms**: Quizlet (flashcards), Anki (spaced repetition), Khan Academy (explanations), YouTube (topic deep-dives)",
+      "**Planning Tools**: Google Calendar (study schedule), Notion (notes + tasks), Trello (progress tracking), Forest (focus sessions)",
+      "**Anxiety Management**: Exam anxiety workbook, university counseling services, Headspace (meditation), breathing technique videos",
+      "**Reddit Communities**: r/GetStudying, r/Study Tips, subject-specific subreddits (ask questions, share resources)",
+      "**Research-Based**: Dunlosky et al. (2013) 'Improving Students' Learning' - ranks study techniques by effectiveness: 1) Practice testing, 2) Distributed practice, 3) Elaborative interrogation",
+      "**Exam Strategy Videos**: Thomas Frank (study strategies), Ali Abdaal (evidence-based learning), Marty Lobdell (study less, study smart)"
+    ]
+  },
+  "motivation": {
+    "keywords": ["motivation", "motivate", "lost interest", "give up", "no motivation", "unmotivated"],
+    "concept": "🔥 Rebuilding Study Motivation",
+    "diagnosis": "You have lost your 'why' - motivation loss is normal and fixable. Remember: motivation follows action, not the other way around",
+    "confidence": 0.85,
+    "rules": [
+      {
+        "id": "motivation_001",
+        "condition": "low_motivation",
+        "recommend": "Reconnect with your 'why': Write down why you started and your bigger goal. Visualize your future self benefiting from today's work",
+        "confidence": 0.89,
+        "priority": 1
+      },
+      {
+        "id": "motivation_002",
+        "condition": "low_motivation",
+        "recommend": "Set micro-goals: 'Study 25 minutes' not 'Master this subject'. Small wins create dopamine → motivation loop",
+        "confidence": 0.87,
+        "priority": 2
+      },
+      {
+        "id": "motivation_003",
+        "condition": "no_progress_visible",
+        "recommend": "Track progress visually with habit tracker or checklist. Seeing progress activates reward circuits in your brain",
+        "confidence": 0.84,
+        "priority": 3,
+        "triggers": ["increased_motivation"]
+      },
+      {
+        "id": "motivation_004",
+        "condition": "burnout",
+        "recommend": "Schedule guilt-free breaks and activities you enjoy. Burnout recovery requires rest, not more pushing",
+        "confidence": 0.82,
+        "priority": 4
+      },
+      {
+        "id": "motivation_005",
+        "condition": "procrastination",
+        "recommend": "Use 'Motivation Equation': Reduce task aversion (break it down), increase value (connect to goals), decrease delay (start now)",
+        "confidence": 0.86,
+        "priority": 2
+      },
+      {
+        "id": "motivation_006",
+        "condition": "comparison_spiral",
+        "recommend": "Delete social media apps during study periods. Comparison kills motivation - focus on YOUR progress, not others' highlight reels",
+        "confidence": 0.83,
+        "priority": 3
+      }
+    ],
+    "explanation": "Motivation ≠ magical feeling that makes you want to work. It's actually: Motivation = (Expectancy × Value) / (Impulsiveness × Delay). Your brain's reward system (dopamine) drives motivation, but it needs EVIDENCE of progress. The motivation myth: 'I'll wait until I feel motivated' → Reality: Action creates motivation. Intrinsic motivation (internal drive) is 3x more powerful than extrinsic (external rewards like grades). Burnout causes: overwhelming goals, no visible progress, disconnection from purpose, chronic stress. The 'why' matters: Students with clear purpose study 40% more effectively. Progress tracking hijacks brain's completion bias - we're wired to finish what we start.",
+    "examples": [
+      "**Finding Your Why**: Write: 'I'm studying [subject] because it will help me [career goal] so I can [life impact].' Example: 'I'm studying CS because it will help me become a software engineer so I can build apps that solve real problems and support my family'",
+      "**Micro-Goal Breakdown**: Instead of 'Study Chapter 5' (vague, intimidating), try '1) Read first 2 pages, 2) Summarize in 3 sentences, 3) Do practice problem 1'. Each completion = dopamine hit",
+      "**Visual Progress System**: Use habit tracking app (Habitica, Streaks) or paper chart. Color each day you study. Breaking a streak hurts psychologically - uses loss aversion to your advantage",
+      "**Implementation Intentions**: Instead of 'I'll study more', specify: 'At 7pm, I will sit at my desk and study Math for 25 minutes'. When-where-what specificity doubles follow-through",
+      "**Temptation Bundling**: Pair unpleasant task with pleasant reward: 'I can only listen to [favorite podcast] while doing [boring assignment]' or 'Coffee shop visit = study session location'",
+      "**Identity-Based Motivation**: Instead of 'I want to get good grades', try 'I am a person who learns consistently'. Identity shift changes behavior long-term",
+      "**Motivation Starter Kit**: Start with SMALLEST possible action - open book, write one sentence, do one problem. Motion creates emotion. Usually doing the first 2 minutes leads to 20 more",
+      "**Accountability Partner**: Study buddy via video call (Focusmate). Social pressure + shared struggle = motivation boost. Weekly check-ins with friend about goals"
+    ],
+    "resources": [
+      "**Books**: 'Atomic Habits' (James Clear - best habit book), 'Drive' (Pink - intrinsic motivation), 'The Motivation Myth' (Jeff Haden), 'Tiny Habits' (BJ Fogg)",
+      "**Apps**: Habitica (gamified habits, free), Forest (focus + trees, $), Streaks (simple tracking), Beeminder (commitment device with money stakes)",
+      "**YouTube**: Matt D'Avella (minimalist motivation), Ali Abdaal (productivity), Better Ideas (motivation science), Thomas Frank",
+      "**Podcasts**: Huberman Lab (motivation neuroscience), The Happiness Lab (motivation psychology), Deep Questions (Cal Newport)",
+      "**Frameworks**: SMART goals (Specific Measurable Achievable Relevant Time-bound), OKRs (Objectives + Key Results), 'Hell Yeah or No' (Derek Sivers)",
+      "**Communities**: Reddit r/GetMotivated, r/GetDisciplined, r/DecidingToBeBetter, Study Discord servers, local study groups",
+      "**Research**: Self-Determination Theory (Deci & Ryan), Temporal Motivation Theory (Piers Steel), Implementation Intentions (Peter Gollwitzer)",
+      "**Crisis Help**: If motivation loss is severe + persistent, talk to counselor - may be depression (treatable). University mental health services are confidential and often free"
+    ]
+  },
+  "confidence": {
+    "keywords": ["confidence", "not smart", "stupid", "dumb", "bad test", "feel stupid", "not good enough"],
+    "concept": "💪 Building Study Confidence",
+    "diagnosis": "Low confidence is blocking your potential - this is about mindset, not ability. Intelligence is NOT fixed",
+    "confidence": 0.88,
+    "rules": [
+      {
+        "id": "confidence_001",
+        "condition": "low_confidence",
+        "recommend": "Adopt growth mindset: Replace 'I can't' with 'I can't YET'. Brain grows with challenge (neuroplasticity) - effort literally builds intelligence",
+        "confidence": 0.92,
+        "priority": 1,
+        "triggers": ["increased_confidence"]
+      },
+      {
+        "id": "confidence_002",
+        "condition": "low_confidence",
+        "recommend": "Keep wins journal: Write 3 daily wins (even tiny ones). Builds evidence of capability that imposter syndrome can't deny. Review when doubting yourself",
+        "confidence": 0.88,
+        "priority": 2
+      },
+      {
+        "id": "confidence_003",
+        "condition": "comparison_trap",
+        "recommend": "Stop comparing to others - only compete with past you. Social media shows everyone's highlight reel. Your only metric: Am I better than yesterday?",
+        "confidence": 0.85,
+        "priority": 3
+      },
+      {
+        "id": "confidence_004",
+        "condition": "test_anxiety",
+        "recommend": "Build confidence staircase: Start with easy problems, gradually increase difficulty. Success breeds success. 10 easy wins > 1 hard failure for confidence",
+        "confidence": 0.89,
+        "priority": 2
+      },
+      {
+        "id": "confidence_005",
+        "condition": "imposter_syndrome",
+        "recommend": "Name the imposter: When self-doubt hits, say 'That's my imposter syndrome talking, not reality'. Recognizing the pattern weakens its power. 70% of people experience this",
+        "confidence": 0.87,
+        "priority": 2
+      },
+      {
+        "id": "confidence_006",
+        "condition": "identity_issues",
+        "recommend": "Change identity label: Stop 'I'm bad at math'. Start 'I'm becoming better at math'. Your brain believes what you tell it. Identity shapes behavior",
+        "confidence": 0.84,
+        "priority": 3
+      },
+      {
+        "id": "confidence_007",
+        "condition": "failure_interpretation",
+        "recommend": "Reframe failure: Not 'I failed' but 'I got feedback'. Edison: 10,000 ways that didn't work before lightbulb. Failure = data, not identity. Success rate increases WITH failure count",
+        "confidence": 0.86,
+        "priority": 3
+      }
+    ],
+    "explanation": "Confidence myths debunked: Intelligence is NOT fixed - it's built through effort and strategy (neuroplasticity). Carol Dweck's research: praising effort vs. ability changes outcomes dramatically. Fixed mindset ('I'm not a math person') vs. Growth mindset ('I haven't mastered this YET') predicts academic performance better than IQ. Real confidence killers: comparison trap (social media shows curated success only), imposter syndrome (70% of high achievers feel this - you're in good company), perfectionism (prevents starting), catastrophizing one bad result (one test ≠ your potential). Intelligence formula: Intelligence = Effort × Strategy × Time. You control 2/3 of that equation. Imposter syndrome paradox: often affects high achievers most because they set high standards. Dunning-Kruger effect: incompetent people overestimate skills, competent people underestimate - if you doubt yourself, you're probably better than you think. Confidence is built, not born with. Neuroplasticity: brain physically changes with learning - literally getting smarter with effort.",
+    "examples": [
+      "**Growth Mindset Reframe**: FIXED: 'I'm terrible at math' → GROWTH: 'I haven't mastered calculus YET. Last week I couldn't do derivatives, now I can. Next week: integrals'. Language matters - 'yet' implies future possibility",
+      "**Wins Journal Protocol**: Every night before bed: '3 wins today: 1) Finished chemistry lab (even though confused), 2) Asked question in class (courage), 3) Studied 30 min (consistency)'. Include effort wins, not just outcome wins. Review when imposter syndrome hits",
+      "**Confidence Staircase**: Day 1: 10 easy problems (build momentum). Day 2: 8 medium + 2 easy. Day 3: 5 hard + 5 medium. Each success = evidence of capability. Confidence comes AFTER success, not before it. Action → Success → Confidence (not the reverse)",
+      "**Imposter Syndrome Counter**: When doubt hits: '70% of successful people feel this. My advisor felt this. Einstein felt this. This feeling means I care about quality, not that I'm incompetent'. List objective evidence: grades, acceptance to university, completed projects",
+      "**Comparison Detox**: Unfollow social media accounts that trigger inadequacy. Replace with past-you comparison: 'Last semester I struggled with this, now it's easy. Progress, not perfection'. Everyone's highlight reel vs. your behind-the-scenes isn't fair comparison",
+      "**Failure Reframe**: Bad grade? Ask: '1) What specific mistakes did I make? 2) What does this teach me about gaps? 3) What will I do differently next time?' Treat it like debugging code - failure is information, not identity",
+      "**Identity Shift**: Replace 'I'm bad at writing' with 'I'm developing my writing skills'. Brain follows identity. Say 'I'm a student who works hard' not 'I'm a smart student' (research shows effort-identity outperforms ability-identity)",
+      "**Morning Confidence Ritual**: Before studying: '1) Review wins journal (evidence), 2) Set 1 achievable goal today, 3) Affirmation: I am capable of learning hard things. I've done it before, I'll do it again'. Prime brain for growth"
+    ],
+    "resources": [
+      "**Books**: 'Mindset' by Carol Dweck (essential - growth mindset origin), 'The Confidence Code' (neuroscience of confidence), 'Grit' by Angela Duckworth (perseverance research), 'The Imposter Cure' by Jessamy Hibberd",
+      "**TED Talks**: Carol Dweck 'The Power of Believing You Can Improve', Angela Duckworth 'Grit: The Power of Passion and Perseverance', Amy Cuddy 'Your Body Language Shapes Who You Are' (confidence posture)",
+      "**YouTube**: Thomas Frank (student mindset), Ali Abdaal (overcoming doubt), Elizabeth Filips (academic confidence), Cajun Koi Academy (growth mindset)",
+      "**Apps**: Reflectly (wins journal, free), Day One (journaling, $), Moodpath (mood + confidence tracking, free), Fabulous (morning routine builder, free tier)",
+      "**Academic**: University counseling (imposter syndrome workshops), peer mentoring programs, study skills workshops, disability services (test anxiety accommodations)",
+      "**Research**: Carol Dweck (growth mindset at Stanford), Angela Duckworth (grit research at UPenn), Martin Seligman (learned optimism), Albert Bandura (self-efficacy theory)",
+      "**Online Communities**: r/GetMotivated, r/DecidingToBeBetter, 7 Cups of Tea (free peer support), BetterHelp (therapy for persistent confidence issues)",
+      "**Crisis Resources**: If confidence issues stem from depression/trauma: University counseling center, National Suicide Prevention Lifeline 988, Crisis Text Line (text HOME to 741741). Persistent self-hatred isn't normal - get help"
+    ]
+  },
+  "sleep": {
+    "keywords": ["sleep", "insomnia", "tired", "exhausted", "can't sleep", "sleep problem"],
+    "concept": "😴 Sleep & Study Performance",
+    "diagnosis": "Poor sleep is sabotaging your study effectiveness. Sleep is not optional - it's when learning actually solidifies in your brain",
+    "confidence": 0.90,
+    "rules": [
+      {
+        "id": "sleep_001",
+        "condition": "poor_sleep",
+        "recommend": "Consistent schedule: Same bedtime and wake time (even weekends). Circadian rhythm consistency improves sleep quality 50%",
+        "confidence": 0.93,
+        "priority": 1,
+        "triggers": ["improved_memory", "reduced_stress"]
+      },
+      {
+        "id": "sleep_002",
+        "condition": "poor_sleep",
+        "recommend": "Digital sunset: No screens 1 hour before bed (blue light suppresses melatonin by 50%). Use blue-light blockers or Night Shift mode after 8pm",
+        "confidence": 0.90,
+        "priority": 2
+      },
+      {
+        "id": "sleep_003",
+        "condition": "racing_thoughts",
+        "recommend": "Write worry list before bed to empty mind. Journaling reduces rumination and sleep onset time by 37%",
+        "confidence": 0.86,
+        "priority": 3
+      },
+      {
+        "id": "sleep_004",
+        "condition": "poor_sleep",
+        "recommend": "Sleep environment: Cool (18-20°C), dark (blackout curtains), quiet (earplugs). Optimal conditions improve deep sleep by 60%",
+        "confidence": 0.84,
+        "priority": 4
+      },
+      {
+        "id": "sleep_005",
+        "condition": "exam_stress",
+        "recommend": "Pre-sleep wind-down ritual: Dim lights at 9pm, warm shower, light reading, no studying 1hr before bed. Signals brain to prepare for sleep",
+        "confidence": 0.88,
+        "priority": 2
+      },
+      {
+        "id": "sleep_006",
+        "condition": "caffeine_late",
+        "recommend": "No caffeine after 2pm. Caffeine half-life is 5-6 hours - afternoon coffee disrupts sleep even if you don't notice",
+        "confidence": 0.87,
+        "priority": 3
+      }
+    ],
+    "explanation": "Sleep is NOT wasted time - it's when learning consolidates. During sleep: 1) Slow-wave sleep (deep sleep) transfers memories from hippocampus → neocortex for long-term storage, 2) REM sleep strengthens procedural memories and makes creative connections, 3) Brain clears toxic waste products (literally) through glymphatic system. One all-nighter = 40% reduction in ability to form new memories. Chronic sleep debt (< 7hrs) accumulates: after 10 days of 6hrs/night, cognitive impairment equals 24hrs awake. Sleep deprivation hits hippocampus (memory), amygdala (emotion regulation), and prefrontal cortex (decision-making) hardest. Teenagers naturally sleep later (delayed circadian phase) - 8am classes fight biology. Naps: 20min = alertness boost, 90min = full sleep cycle (good before exam).",
+    "examples": [
+      "**Consistent Schedule**: Pick bedtime (e.g., 11pm) and wake time (e.g., 7am). Set DAILY including weekends for 2 weeks - circadian rhythm entrains. Use gentle alarm like sunrise simulator or gradual volume increase",
+      "**Digital Sunset Protocol**: 9pm = enable Night Shift/blue light filter on all devices, dim indoor lights, stop work/studying. 10pm = put phone in another room (charging), final bathroom/water, read physical book (not backlit e-reader) for 20-30 min. 10:30pm = lights out",
+      "**Worry Dump**: Keep notebook by bed. Before sleep, write: 1) Things worrying me, 2) Things I need to remember tomorrow, 3) Quick to-do for tomorrow. Externalizing thoughts reduces nighttime rumination",
+      "**Sleep Environment Optimization**: Room temp 18-20°C (cool but not cold), blackout curtains or sleep mask, white noise machine or earplugs (especially dorms), comfortable mattress/pillow, no clock visible (reduces clock-watching anxiety)",
+      "**10-3-2-1-0 Rule**: 10hrs before bed = no more caffeine, 3hrs before = no more food/alcohol, 2hrs before = no more work, 1hr before = no screens, 0 = times you hit snooze (get up immediately)",
+      "**Can't Sleep Protocol**: If awake 20+ minutes in bed, GET UP (don't lie there frustrated). Go to different room, dim light, boring activity (read phone book, not engaging book). Return when sleepy. Breaks bed-wakefulness association",
+      "**Power Nap Science**: Set timer for 20 minutes (prevents deep sleep grogginess). Nap between 1-3pm (natural energy dip). Don't nap after 3pm (delays nighttime sleep). Coffee nap: drink coffee, immediately nap 20min - caffeine kicks in as you wake",
+      "**Morning Light Exposure**: Get sunlight within 30min of waking (open curtains, go outside). Bright light resets circadian rhythm, suppresses melatonin, and improves nighttime sleep quality. Use SAD light if winter/cloudy"
+    ],
+    "resources": [
+      "**Books**: 'Why We Sleep' (Matthew Walker - MUST READ), 'The Sleep Solution' (Chris Winter), 'Sleep Smarter' (Shawn Stevenson)",
+      "**Apps**: Sleep Cycle (smart alarm), Calm/Headspace (sleep stories/meditations), f.lux (blue light filter for computer), Twilight (Android blue light)",
+      "**Tracking**: Fitbit, Apple Watch, Oura Ring (tracks sleep stages), Sleep Diary (manual tracking to identify patterns)",
+      "**Environment**: Blackout curtains ($20-50), white noise machine or fan, cooling mattress pad, weighted blanket (some people), blue-light blocking glasses ($10-30)",
+      "**Research**: Matthew Walker (UC Berkeley), Sleep Foundation, National Sleep Foundation guidelines (sleepfoundation.org)",
+      "**Conditions**: If chronic insomnia persists > 1 month despite sleep hygiene, see doctor. May be sleep apnea, restless legs, anxiety disorder (all treatable)",
+      "**University Resources**: Many universities have sleep clinics or counselors specializing in sleep issues. Cognitive Behavioral Therapy for Insomnia (CBT-I) is evidence-based",
+      "**Emergency Fixes**: If exam tomorrow and slept poorly: 1) Don't panic (stress makes it worse), 2) 20min power nap before exam, 3) Cold water on face, 4) Light exercise, 5) Accept reduced performance but do your best"
+    ]
+  },
+  "focus": {
+    "keywords": ["focus", "concentration", "distraction", "attention", "mind wandering", "procrastinate"],
+    "concept": "🎯 Focus & Concentration Enhancement",
+    "diagnosis": "You need strategies to improve concentration and reduce distractions. Modern attention spans average 47 seconds - this is trainable!",
+    "confidence": 0.88,
+    "rules": [
+      {
+        "id": "focus_001",
+        "condition": "mentions_focus",
+        "recommend": "Use the Pomodoro Technique: 25 minutes focused work, 5 minute break. Extends attention span by leveraging natural ultradian rhythms",
+        "confidence": 0.92,
+        "priority": 1
+      },
+      {
+        "id": "focus_002",
+        "condition": "mentions_focus",
+        "recommend": "Eliminate digital distractions: Turn off notifications, use website blockers. Each distraction costs 23 minutes of recovery time",
+        "confidence": 0.90,
+        "priority": 2
+      },
+      {
+        "id": "focus_003",
+        "condition": "high_stress",
+        "recommend": "Practice mindfulness meditation (10 min/day) to improve attention control. Studies show 20% improvement in focus after 8 weeks",
+        "confidence": 0.87,
+        "priority": 3
+      },
+      {
+        "id": "focus_004",
+        "condition": "low_sleep",
+        "recommend": "Prioritize sleep - even one hour more can dramatically improve focus. Sleep deprivation reduces attention by 40%",
+        "confidence": 0.88,
+        "priority": 4
+      },
+      {
+        "id": "focus_005",
+        "condition": "mentions_focus",
+        "recommend": "Create a dedicated study space with minimal distractions. Environmental cues train brain to enter focus mode automatically",
+        "confidence": 0.85,
+        "priority": 5
+      },
+      {
+        "id": "focus_006",
+        "condition": "digital_overload",
+        "recommend": "Practice 'Deep Work' sessions: 90-120 min blocks of distraction-free work on ONE task. Builds cognitive endurance progressively",
+        "confidence": 0.89,
+        "priority": 2
+      },
+      {
+        "id": "focus_007",
+        "condition": "multitasking",
+        "recommend": "Single-task ruthlessly. Multitasking reduces productivity by 40% and increases errors by 50%. Your brain can't actually multitask",
+        "confidence": 0.91,
+        "priority": 3
+      }
+    ],
+    "explanation": "Focus is controlled by your prefrontal cortex (executive function) and attention networks (dorsal and ventral). When you concentrate, your brain suppresses irrelevant stimuli through a process called 'selective attention'. Each distraction forces a 'context switch' - your brain must save current task state, load new task, then reload original task (23 min average cost). Modern digital environments exploit your brain's novelty-seeking dopamine circuits, making sustained focus harder. However, attention is like a muscle - it strengthens with training. Flow state (optimal focus) occurs when challenge matches skill level and distractions are minimized. Sleep, glucose levels, and stress hormones all affect focus capacity.",
+    "examples": [
+      "**Pomodoro Mastery**: Set timer for 25 min. ONE task only. When mind wanders, gently redirect. After 4 pomodoros (2 hrs), take 15-30 min break. Track completed pomodoros daily",
+      "**Deep Work Block**: 9am-11am = Deep Work (hardest cognitive task). Phone in another room. Email/Slack closed. Door shut. Just you and the work. 11am-12pm = Shallow work (emails, admin)",
+      "**Environment Design**: Study desk = work only (no phone, games, food). Consistent location trains brain. Library desk, coffee shop table, or home office - but ONE place = ONE task",
+      "**Digital Minimalism**: Phone on airplane mode during focus sessions. Delete social media apps (use browser with site blockers). Batch check email 3x daily (9am, 1pm, 5pm)",
+      "**Attention Training**: Practice 'Just One Breath' - when distracted, take one mindful breath before redirecting. Builds metacognitive awareness of distraction patterns",
+      "**Pre-Focus Ritual**: Clear desk → Close tabs → Put phone away → Glass of water → Set timer → Write down 'I will [specific task]' → Begin. Ritual signals brain to focus",
+      "**Energy Management**: Hardest tasks when energy peaks (morning for most). Routine tasks when tired. Glucose dip at 3pm - have apple/nuts, not sugar crash",
+      "**Accountability Partner**: Study video call with friend - both on mute, cameras on. Social pressure + community = doubled focus duration"
+    ],
+    "resources": [
+      "**Books**: 'Deep Work' (Cal Newport - essential), 'Flow' (Csikszentmihalyi), 'Hyperfocus' (Chris Bailey), 'Stolen Focus' (Johann Hari)",
+      "**Apps**: Forest ($, gamified focus), Freedom (powerful website blocker), Cold Turkey (free blocker), Brain.fm (focus music), Focusmate (virtual coworking)",
+      "**Techniques**: Pomodoro, Flowtime (flexible Pomodoro), 52-17 (52 min work, 17 min break - optimal for some), Ultradian sprints",
+      "**YouTube**: Study with Me channels (accountability), Lofi Girl (background music), Andrew Huberman (focus neuroscience)",
+      "**Courses**: Coursera 'Learning How to Learn', Cal Newport's blog (Study Hacks), Ultralearning (Scott Young)",
+      "**Environment**: Noise-canceling headphones, standing desk converter, blue-light blocking glasses (evening), full-spectrum lamp",
+      "**Research**: Gloria Mark (UCI) on distraction costs, Mihaly Csikszentmihalyi on flow states, Cal Newport on deep work"
+    ]
+  },
+  "inferences": {
+    "high_stress_to_low_focus": {
+      "from_fact": "stress_level=high",
+      "infer_fact": "focus_level=low",
+      "confidence": 0.85,
+      "explanation": "High stress impairs prefrontal cortex function, reducing focus ability"
+    },
+    "poor_sleep_to_weak_memory": {
+      "from_fact": "sleep_hours<7",
+      "infer_fact": "memory_consolidation=weak",
+      "confidence": 0.90,
+      "explanation": "Sleep deprivation prevents memory consolidation during REM and deep sleep"
+    },
+    "low_motivation_to_procrastination": {
+      "from_fact": "motivation_level=low",
+      "infer_fact": "procrastination_risk=high",
+      "confidence": 0.78,
+      "explanation": "Low motivation increases likelihood of task avoidance"
+    },
+    "exam_anxiety_to_stress": {
+      "from_fact": "exam_anxiety=true",
+      "infer_fact": "stress_level=high",
+      "confidence": 0.92,
+      "explanation": "Exam anxiety triggers physiological stress response"
+    }
+  }
+}
