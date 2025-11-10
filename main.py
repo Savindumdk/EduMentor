@@ -478,24 +478,11 @@ def study_guide_tab():
             st.success("Study guide session reset!")
             st.rerun()
     
-    # Main content
-    st.markdown("## 🧠 Your Personal Study & Wellness Guide")
-    st.markdown("""
-    Welcome to your comprehensive study companion! This expert system helps you with:
-    - 📖 Study techniques and learning strategies
-    - 🧘 Stress management and mental wellness
-    - 💪 Motivation and psychological support
-    - ⏰ Time management and productivity
-    - 🎯 Exam preparation and test-taking strategies
-    
-    **NEW: Multi-Input Analysis** - Provide detailed information for highly personalized recommendations!
-    """)
+    # Main content - simplified header
+    st.markdown("### 📊 Personalized Study Analysis")
+    st.markdown("*Provide your information to get personalized study recommendations*")
     
     st.markdown("---")
-    
-    # ====== ENHANCED Multi-Input Study Guide UI ======
-    st.markdown("### 📊 Personalized Study Analysis")
-    st.markdown("*Fill in as many fields as you can for better recommendations*")
     
     # Create two columns for inputs
     col1, col2 = st.columns(2)
@@ -525,28 +512,62 @@ def study_guide_tab():
     
     with col2:
         st.markdown("#### 📈 Quantitative Inputs")
+        st.caption("💡 *Leave fields empty to test uncertainty handling*")
         
-        # Numeric inputs
-        study_hours = st.slider("📚 Study hours per day:", 0, 12, 4, 
-                                help="How many hours do you typically study each day?")
+        # Numeric inputs as number_input (can be left empty)
+        study_hours = st.number_input(
+            "📚 Study hours per day (0-12):", 
+            min_value=0, 
+            max_value=12, 
+            value=None,
+            step=1,
+            help="How many hours do you typically study each day? Leave empty if unsure.",
+            placeholder="e.g., 4"
+        )
         
-        stress_level = st.slider("😰 Current stress level (1-10):", 1, 10, 5,
-                                 help="1 = Very relaxed, 10 = Extremely stressed")
+        stress_level = st.number_input(
+            "😰 Current stress level (1-10):", 
+            min_value=1, 
+            max_value=10, 
+            value=None,
+            step=1,
+            help="1 = Very relaxed, 10 = Extremely stressed. Leave empty if unsure.",
+            placeholder="e.g., 5"
+        )
         
-        sleep_hours = st.slider("😴 Sleep hours per night:", 3, 12, 7,
-                                help="How many hours of sleep do you get on average?")
+        sleep_hours = st.number_input(
+            "😴 Sleep hours per night (1-12):", 
+            min_value=1, 
+            max_value=12, 
+            value=None,
+            step=1,
+            help="How many hours of sleep do you get on average? Leave empty if unsure.",
+            placeholder="e.g., 7"
+        )
         
-        # Boolean input
-        has_upcoming_exam = st.checkbox("📅 I have an exam coming up soon (within 2 weeks)")
+        # Boolean input with tri-state (Yes/No/Not Sure)
+        exam_option = st.radio(
+            "📅 Do you have an exam coming up soon (within 2 weeks)?",
+            ["Not sure", "Yes", "No"],
+            horizontal=True
+        )
+        has_upcoming_exam = None if exam_option == "Not sure" else (exam_option == "Yes")
         
-        # Visual indicators
+        # Visual indicators (only show if values are provided)
         st.markdown("---")
-        if stress_level >= 8:
+        warnings_shown = False
+        if stress_level is not None and stress_level >= 8:
             st.warning("⚠️ High stress detected!")
-        if sleep_hours < 6:
+            warnings_shown = True
+        if sleep_hours is not None and sleep_hours < 6:
             st.warning("⚠️ Sleep deprivation alert!")
-        if study_hours >= 8 and stress_level >= 7:
+            warnings_shown = True
+        if study_hours is not None and stress_level is not None and study_hours >= 8 and stress_level >= 7:
             st.error("🚨 Burnout risk detected!")
+            warnings_shown = True
+        
+        if not warnings_shown:
+            st.info("ℹ️ Provide more data for personalized insights")
     
     st.markdown("---")
     
@@ -573,44 +594,16 @@ def study_guide_tab():
                 st.error("❌ Unable to generate recommendations. Please try again.")
 
 def display_study_guide_response(response):
-    """Display study guide response with proper formatting."""
+    """Display study guide response with proper formatting and LLM refinement."""
     if isinstance(response, dict):
-        # Display user profile summary if available
-        if response.get('user_profile'):
-            profile = response['user_profile']
-            with st.expander("👤 Your Profile Summary", expanded=False):
-                cols = st.columns(3)
-                if profile.get('study_hours'):
-                    cols[0].metric("📚 Study Hours/Day", f"{profile['study_hours']}h")
-                if profile.get('stress_level'):
-                    stress_color = "🔴" if profile['stress_level'] >= 7 else "🟡" if profile['stress_level'] >= 4 else "🟢"
-                    cols[1].metric("😰 Stress Level", f"{stress_color} {profile['stress_level']}/10")
-                if profile.get('sleep_hours'):
-                    sleep_emoji = "✅" if profile['sleep_hours'] >= 7 else "⚠️"
-                    cols[2].metric("😴 Sleep Hours", f"{sleep_emoji} {profile['sleep_hours']}h")
-                
-                if profile.get('learning_style'):
-                    st.info(f"🎨 **Learning Style:** {profile['learning_style'].capitalize()}")
-                if profile.get('has_upcoming_exam'):
-                    st.warning("📅 **Upcoming Exam:** Yes - using time-sensitive strategies")
         
         # Display uncertainty explanation (prominent)
         if response.get('uncertainty_explanation'):
             st.markdown(response['uncertainty_explanation'])
         
-        # Display confidence score with breakdown
+        # Display confidence score
         if response.get('confidence'):
-            conf_col1, conf_col2 = st.columns([1, 2])
-            with conf_col1:
-                st.metric("💯 Confidence", f"{response['confidence']:.0%}")
-            with conf_col2:
-                if response.get('confidence_breakdown'):
-                    breakdown = response['confidence_breakdown']
-                    with st.expander("� Confidence Breakdown"):
-                        st.markdown(f"**Base Inputs:** +{breakdown.get('base_inputs', 0)*100:.0f}%")
-                        st.markdown(f"**Missing Data Penalty:** {breakdown.get('missing_data_penalty', 0)*100:.0f}%")
-                        st.markdown(f"**Pattern Bonus:** +{breakdown.get('pattern_bonus', 0)*100:.0f}%")
-                        st.markdown(f"**Risk Penalty:** {breakdown.get('risk_penalty', 0)*100:.0f}%")
+            st.metric("💯 Confidence", f"{response['confidence']:.0%}")
         
         # Display missing information warnings
         if response.get('missing_info_suggestions') and len(response['missing_info_suggestions']) > 0:
@@ -626,14 +619,71 @@ def display_study_guide_response(response):
         if response.get('diagnosis'):
             st.markdown(f"**💡 Diagnosis:** {response['diagnosis']}")
         
+        # Display LLM reasoning explanation - STEP-BY-STEP INFERENCE PROCESS
+        if response.get('reasoning_trace') and len(response['reasoning_trace']) > 0:
+            st.markdown("### 🤔 Why These Recommendations?")
+            st.markdown("*Understanding how the expert system analyzed your profile*")
+            
+            with st.spinner("🧠 Analyzing inference process..."):
+                reasoning = generate_reasoning_explanation(response)
+                
+                # Display step-by-step reasoning
+                st.markdown("#### 📊 Step-by-Step Reasoning Process")
+                st.info(reasoning)
+                
+                # Show detailed rule firing in expandable section
+                with st.expander("🔍 View Detailed Rule Firing Sequence", expanded=False):
+                    st.markdown("**How the inference engine analyzed your data:**")
+                    
+                    # Organize rules by category
+                    critical_rules = [r for r in response['reasoning_trace'] if r.strip() and ("🚨" in r or "CRITICAL" in r)]
+                    warning_rules = [r for r in response['reasoning_trace'] if r.strip() and "⚠️" in r and "🚨" not in r]
+                    optimal_rules = [r for r in response['reasoning_trace'] if r.strip() and ("✓" in r or "✅" in r)]
+                    other_rules = [r for r in response['reasoning_trace'] if r.strip() and r not in critical_rules + warning_rules + optimal_rules]
+                    
+                    if critical_rules:
+                        st.markdown("**🚨 Critical Patterns Detected:**")
+                        for rule in critical_rules:
+                            st.markdown(f"- {rule}")
+                        st.markdown("")
+                    
+                    if warning_rules:
+                        st.markdown("**⚠️ Warning Patterns Detected:**")
+                        for rule in warning_rules:
+                            st.markdown(f"- {rule}")
+                        st.markdown("")
+                    
+                    if optimal_rules:
+                        st.markdown("**✅ Positive Patterns Detected:**")
+                        for rule in optimal_rules:
+                            st.markdown(f"- {rule}")
+                        st.markdown("")
+                    
+                    if other_rules:
+                        st.markdown("**🔍 Additional Inferences:**")
+                        for rule in other_rules:
+                            st.markdown(f"- {rule}")
+                    
+                    # Show inferred facts
+                    if response.get('inferred_facts'):
+                        st.markdown("---")
+                        st.markdown("**🎯 Patterns Identified:**")
+                        for fact in response['inferred_facts']:
+                            st.markdown(f"✓ `{fact}`")
+        
         # Display explanation
         if response.get('explanation'):
             st.markdown(f"**📝 Explanation:**\n\n{response['explanation']}")
         
-        # Display recommendations (highlighted)
+        # Display recommendations - REFINED WITH LLM
         if response.get('recommendation'):
             st.markdown("### ✅ Personalized Recommendations")
-            st.markdown(response['recommendation'])
+            
+            # Show original expert system recommendations
+            with st.spinner("🤖 Refining recommendations with AI..."):
+                # Refine with LLM
+                refined = refine_study_guide_with_llm(response)
+                st.markdown(refined)
         
         # Display examples
         if response.get('examples') and len(response['examples']) > 0:
@@ -653,25 +703,245 @@ def display_study_guide_response(response):
                 st.markdown("**How the system arrived at this conclusion:**")
                 for step in response['reasoning_trace']:
                     st.markdown(f"- {step}")
-        
-        # Display inferred facts (for advanced users)
-        if response.get('inferred_facts') and len(response['inferred_facts']) > 0:
-            with st.expander("🧠 Inferred Facts & Patterns"):
-                st.markdown("**Additional insights discovered from your inputs:**")
-                for fact in response['inferred_facts']:
-                    st.markdown(f"• {fact}")
-        
-        # Display fired rules (for debugging/transparency)
-        if response.get('fired_rules') and len(response['fired_rules']) > 0:
-            with st.expander("⚙️ Rules Applied (Technical Details)"):
-                st.markdown(f"**{len(response['fired_rules'])} rules were triggered:**")
-                for rule_id in response['fired_rules']:
-                    st.code(rule_id)
     else:
         st.markdown(str(response))
         if st.button("How does respiration work?"):
             st.session_state.messages.append({"role": "user", "content": "How does respiration work?"})
             st.rerun()
+
+
+def refine_study_guide_with_llm(response: dict) -> str:
+    """
+    Refine study guide recommendations using LLM to make them more personalized and actionable.
+    
+    Args:
+        response: The expert system response dictionary
+        
+    Returns:
+        Refined recommendation text
+    """
+    from openai import OpenAI
+    import os
+    
+    # Get OpenAI client
+    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    
+    # Extract information from response
+    category = response.get('concept', 'Study Guidance')
+    diagnosis = response.get('diagnosis', '')
+    explanation = response.get('explanation', '')
+    recommendations = response.get('recommendation', '')
+    user_profile = response.get('user_profile', {})
+    
+    # Build context for LLM
+    context_parts = [f"**Category:** {category}"]
+    
+    if diagnosis:
+        context_parts.append(f"**Diagnosis:** {diagnosis}")
+    
+    if user_profile:
+        profile_str = []
+        if user_profile.get('study_hours'):
+            profile_str.append(f"Studies {user_profile['study_hours']} hours/day")
+        if user_profile.get('stress_level'):
+            profile_str.append(f"Stress level: {user_profile['stress_level']}/10")
+        if user_profile.get('sleep_hours'):
+            profile_str.append(f"Gets {user_profile['sleep_hours']} hours sleep")
+        if user_profile.get('learning_style'):
+            profile_str.append(f"Learning style: {user_profile['learning_style']}")
+        if user_profile.get('has_upcoming_exam'):
+            profile_str.append("Has upcoming exam")
+        
+        if profile_str:
+            context_parts.append(f"**Student Profile:** {', '.join(profile_str)}")
+    
+    context = "\n".join(context_parts)
+    
+    # Create prompt for LLM
+    prompt = f"""You are an expert educational advisor helping a student with their study challenges.
+
+Based on the expert system analysis:
+
+{context}
+
+**Expert System Recommendations:**
+{recommendations}
+
+**Scientific Explanation:**
+{explanation}
+
+CRITICAL INSTRUCTIONS:
+- Use ONLY the information provided above from the expert system
+- Do NOT add any external knowledge, techniques, or recommendations not mentioned in the expert system output
+- Do NOT introduce new concepts, methods, or resources
+- Your role is to REPHRASE and REORGANIZE the existing recommendations only
+
+Please refine these recommendations to make them:
+1. More personalized and empathetic (using the student profile provided)
+2. Action-oriented with clear next steps (based on the expert recommendations)
+3. Encouraging and motivating (but stay true to the expert system's advice)
+4. Easy to understand and implement (simplify the language only)
+
+Transform the expert system's recommendations into a conversational, supportive format.
+Use bullet points for clarity. Focus on what the student should DO RIGHT NOW and THIS WEEK.
+Remember: ONLY use information from the expert system above - do not add new suggestions.
+
+Refined Recommendations:"""
+
+    try:
+        # Call OpenAI API
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are an empathetic educational advisor who rephrases expert system recommendations. You MUST use only the information provided by the expert system - do not add external knowledge or new suggestions. Your role is to make the existing recommendations more conversational, personalized, and actionable while staying strictly faithful to the source material."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=800
+        )
+        
+        refined_text = completion.choices[0].message.content.strip()
+        return refined_text
+        
+    except Exception as e:
+        # Fallback to original recommendations if LLM fails
+        st.warning(f"Could not refine recommendations with AI: {str(e)}")
+        return recommendations
+
+
+def generate_reasoning_explanation(response: dict) -> str:
+    """
+    Generate LLM-powered step-by-step explanation of the inference process.
+    Shows which rules fired and why specific recommendations were chosen.
+    
+    Args:
+        response: The expert system response dictionary
+        
+    Returns:
+        Detailed step-by-step reasoning explanation
+    """
+    from openai import OpenAI
+    import os
+    
+    # Get OpenAI client
+    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    
+    # Extract analysis information
+    fired_rules = response.get('fired_rules', [])
+    inferred_facts = response.get('inferred_facts', [])
+    reasoning_trace = response.get('reasoning_trace', [])
+    user_profile = response.get('user_profile', {})
+    diagnosis = response.get('diagnosis', '')
+    confidence = response.get('confidence', 0)
+    
+    # Build detailed context for step-by-step reasoning
+    profile_items = [f"**{k.replace('_', ' ').title()}**: {v}" for k, v in user_profile.items() if v is not None]
+    profile_str = "\n".join(profile_items)
+    
+    # Organize reasoning trace by type (warnings, optimal, inferences)
+    critical_rules = []
+    warning_rules = []
+    optimal_rules = []
+    inference_rules = []
+    
+    for rule in reasoning_trace:
+        if rule.strip():
+            if "🚨" in rule or "CRITICAL" in rule or "EMERGENCY" in rule:
+                critical_rules.append(rule)
+            elif "⚠️" in rule or "Rule Fired:" in rule:
+                warning_rules.append(rule)
+            elif "✓" in rule or "✅" in rule:
+                optimal_rules.append(rule)
+            elif "Infer:" in rule or "→" in rule:
+                inference_rules.append(rule)
+            else:
+                inference_rules.append(rule)
+    
+    # Build organized rules string
+    rules_sections = []
+    if critical_rules:
+        rules_sections.append("**🚨 CRITICAL PATTERNS:**\n" + "\n".join([f"  • {r.replace('🚨', '').strip()}" for r in critical_rules]))
+    if warning_rules:
+        rules_sections.append("**⚠️ WARNING PATTERNS:**\n" + "\n".join([f"  • {r.replace('⚠️', '').strip()}" for r in warning_rules]))
+    if optimal_rules:
+        rules_sections.append("**✅ OPTIMAL PATTERNS:**\n" + "\n".join([f"  • {r.replace('✓', '').replace('✅', '').strip()}" for r in optimal_rules]))
+    if inference_rules:
+        rules_sections.append("**🔍 INFERENCES:**\n" + "\n".join([f"  • {r.strip()}" for r in inference_rules]))
+    
+    rules_str = "\n\n".join(rules_sections) if rules_sections else "No specific rules fired"
+    
+    facts_str = "\n".join([f"  • {fact}" for fact in inferred_facts]) if inferred_facts else "baseline assessment"
+    
+    # Create detailed step-by-step prompt
+    prompt = f"""You are analyzing an expert system's inference process. Provide a clear, step-by-step explanation of HOW and WHY the system arrived at its recommendations.
+
+**📊 STUDENT PROFILE (INPUT DATA):**
+{profile_str}
+
+**🔍 INFERENCE ENGINE RESULTS:**
+
+{rules_str}
+
+**🎯 DETECTED PATTERNS:**
+{facts_str}
+
+**💡 FINAL DIAGNOSIS:**
+{diagnosis}
+
+**📈 CONFIDENCE LEVEL:** {confidence:.0%}
+
+---
+
+**YOUR TASK:**
+Write a step-by-step explanation (3-5 sentences) that walks through the reasoning process:
+
+1. **Start with the input**: What data did the student provide?
+2. **Rule firing sequence**: Which rules were triggered and in what order (mention specific patterns like "0h study", "7h sleep", "1/10 stress")?
+3. **Pattern detection logic**: Why did those specific rules fire? What thresholds or conditions were met?
+4. **Priority explanation**: Why are certain recommendations prioritized over others?
+5. **Conclusion**: How do these patterns together inform the final recommendations?
+
+**CRITICAL CONSTRAINTS:**
+- Use ONLY the information provided above from the expert system
+- Reference specific numbers from the profile (e.g., "0 hours of study", "7 hours of sleep")
+- Explain the LOGIC behind each rule firing
+- Be precise about which patterns triggered which rules
+- Do NOT add external knowledge or new recommendations
+- Be conversational but technically accurate
+
+**FORMAT:**
+Present as a flowing narrative that connects: Input Data → Rules Fired → Patterns Detected → Recommendations Logic"""
+
+    try:
+        # Call GPT-4o-mini for detailed reasoning explanation
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert system explainer. You provide clear, step-by-step explanations of inference processes, showing how input data triggers specific rules and leads to recommendations. Use only the provided information."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.3,  # Lower temperature for factual explanation
+            max_tokens=400  # Increased for detailed explanation
+        )
+        
+        return completion.choices[0].message.content.strip()
+    
+    except Exception as e:
+        # Fallback to structured explanation if LLM fails
+        fallback = f"**Analysis of Your Profile:**\n\n"
+        fallback += f"Your input data: {', '.join([f'{k}={v}' for k, v in user_profile.items() if v is not None])}\n\n"
+        fallback += f"**Rules Triggered:**\n"
+        for rule in reasoning_trace[:5]:
+            if rule.strip():
+                fallback += f"• {rule}\n"
+        fallback += f"\n**Result:** {diagnosis}"
+        return fallback
 
 
 if __name__ == "__main__":

@@ -56,6 +56,10 @@ class ExpertAgent:
         # Conversation history for context
         self.conversation_history = []
         
+        # Track the last offered topic for follow-up confirmations
+        self.last_offered_topic = None
+        self.last_tool_used = None
+        
         print("✅ Expert Agent initialized with tools:")
         print("   - Biology Expert (Knowledge Base)")
         print("   - Physics Expert (Knowledge Base)")
@@ -163,10 +167,7 @@ Available Expert System Tools:
    - Returns: Concept explanation, examples, topic classification
    - Usage: Declare Fact(query_topic='topic_name') where topic_name matches the specific chemistry concept
 
-4. **study_guide_expert**: Use for study guidance and diagnostic questions
-   - Topics: Study weaknesses, MCQ strategies, essay writing, exam preparation
-   - Returns: Personalized diagnosis through progressive questioning
-   - Usage: Progressive questioning system - responds to student's study problems
+NOTE: Study Guide expert is now handled in a separate tab and not available through this agent.
 
 CRITICAL - Topic Selection Strategy:
 - ALWAYS choose the MOST SPECIFIC topic available
@@ -312,46 +313,27 @@ REASONING: The query asks about digestive "processes" (plural), which includes b
         # Reset and prepare expert
         expert.reset()
         
-        # Handle different expert types
-        if tool_name == 'study_guide_expert':
-            # Study guide uses diagnostic questioning
-            expert.run()
-            
-            if expert.requires_clarification():
-                return {
-                    'success': True,
-                    'needs_clarification': True,
-                    'clarification_question': expert.get_clarification_question(),
-                    'tool_used': tool_name
-                }
-            elif expert.is_diagnosis_complete():
-                return {
-                    'success': True,
-                    'response': expert.get_response(),
-                    'tool_used': tool_name
-                }
+        # Information experts (Biology, Physics, Chemistry) use query_topic
+        from experta import Fact
+        expert.declare(Fact(query_topic=query_topic))
+        expert.run()
+        
+        response = expert.get_response()
+        
+        if response:
+            return {
+                'success': True,
+                'response': response,
+                'tool_used': tool_name,
+                'query_topic': query_topic
+            }
         else:
-            # Information experts use query_topic
-            from experta import Fact
-            expert.declare(Fact(query_topic=query_topic))
-            expert.run()
-            
-            response = expert.get_response()
-            
-            if response:
-                return {
-                    'success': True,
-                    'response': response,
-                    'tool_used': tool_name,
-                    'query_topic': query_topic
-                }
-            else:
-                return {
-                    'success': False,
-                    'error': f"No match found for topic '{query_topic}'",
-                    'tool_used': tool_name,
-                    'suggestion': 'Try rephrasing or using more specific terms'
-                }
+            return {
+                'success': False,
+                'error': f"No match found for topic '{query_topic}'",
+                'tool_used': tool_name,
+                'suggestion': 'Try rephrasing or using more specific terms'
+            }
         
         return {
             'success': False,
@@ -400,38 +382,71 @@ REASONING: The query asks about digestive "processes" (plural), which includes b
         examples = expert_response.get('examples', [])
         topic = expert_response.get('topic', '')
         
-        # Use LLM to create natural response
-        prompt = f"""You are an O/L tutor. A student asked: "{user_query}"
+        # Use LLM to create natural response that targets the specific question
+        prompt = f"""You are an O/L tutor helping a student. The student asked: "{user_query}"
 
-The expert system provided this information:
+**EXPERT SYSTEM OUTPUT (YOUR ONLY SOURCE OF INFORMATION):**
 - Concept: {concept}
 - Explanation: {explanation}
-- Examples: {', '.join(examples) if examples else 'None'}
+- Examples: {', '.join(examples[:3]) if examples else 'None'}
 - Subject: {topic}
 
-Create a clear, natural response that:
-1. Directly answers the student's question
-2. Uses the EXACT information from the expert system (don't add new facts)
-3. Incorporates the examples naturally
-4. Is conversational and encouraging
-5. Stays within O/L syllabus scope
+**YOUR TASK:**
 
-Keep it concise (3-4 paragraphs max)."""
+1. **Answer the SPECIFIC question asked** - Don't provide a general overview. Target exactly what the student wants to know.
+
+2. **Prioritize relevance** - Start with the most relevant information from the expert system that directly addresses their question.
+
+3. **Use ONLY the expert system information** - Do NOT add external facts, concepts, or examples not provided above.
+
+4. **Progressive guidance with ONE SPECIFIC actionable question** - After answering, ask exactly 1 follow-up question that:
+   - Is SPECIFIC and ACTIONABLE (e.g., "Shall I explain epithelial tissue next?" not "Which tissue interests you?")
+   - Offers to explain a specific sub-topic or related concept from the expert system
+   - Guides them to the next logical learning step
+   - Uses phrases like "Shall I...", "Would you like me to...", "Let me know if you'd like..."
+   - References a specific topic/concept from the expert system output
+   - Can be answered with a simple "yes" or short response
+
+5. **Format:**
+   - Start with direct answer (2-3 paragraphs max)
+   - Include relevant examples from expert system
+   - Add brief reasoning (1 sentence explaining why expert system gave this answer)
+   - End with EXACTLY 1 SPECIFIC actionable question (prefix with "💭 ")
+
+**CRITICAL CONSTRAINTS:**
+- Use ONLY information from the expert system output above
+- Do NOT introduce new concepts, facts, or examples
+- Do NOT provide information beyond what the expert system provided
+- Target the specific question, not a general explanation
+- Keep response focused and concise (under 400 words)
+- Follow-up questions MUST be specific offers to explain particular topics
+
+**Example Good Response Format:**
+[Direct targeted answer based on expert system]
+
+[Relevant example from expert system]
+
+🔍 **Why this answer?** The expert system matched your query to the "{concept}" topic, which provides comprehensive coverage of what you asked about.
+
+ Shall I explain [specific sub-topic from expert system] in more detail?"""
 
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a friendly O/L tutor helping students understand concepts."},
+                    {
+                        "role": "system", 
+                        "content": "You are an O/L tutor. You MUST use ONLY the expert system information provided. Never add external knowledge. Focus on answering the specific question asked, not providing general overviews. Guide students with EXACTLY 1 SPECIFIC actionable follow-up question (e.g., 'Shall I explain X next?' not 'What interests you?'). The question should be answerable with a simple 'yes'. Always include brief reasoning about why the expert system gave this answer."
+                    },
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
-                max_tokens=800
+                temperature=0.4,  # Lower temperature for more focused responses
+                max_tokens=550  # Slightly increased to accommodate reasoning
             )
             enhanced = response.choices[0].message.content.strip()
             
             # Add attribution
-            return f"{enhanced}\n\n---\n*Source: {topic} Expert System*"
+            return f"{enhanced}\n\n---\n*📚 Source: {topic} Expert System*"
             
         except Exception as e:
             print(f"⚠️ Error enhancing response: {e}")
@@ -476,49 +491,84 @@ Keep it concise (3-4 paragraphs max)."""
             if topic:
                 topics.add(topic)
         
-        # Create synthesis prompt
-        prompt = f"""You are an O/L tutor. A student asked: "{user_query}"
+        # Create synthesis prompt focused on answering the specific question
+        prompt = f"""You are an O/L tutor. The student asked: "{user_query}"
 
-The expert system found {len(responses)} RELATED concepts that match this query. Your task is to synthesize these into ONE comprehensive, well-organized answer.
+**EXPERT SYSTEM OUTPUT (YOUR ONLY SOURCE):**
 
-MATCHED CONCEPTS:
+The expert system found {len(responses)} related concepts:
+
+CONCEPTS:
 {chr(10).join(all_concepts)}
 
 DETAILED INFORMATION:
 {chr(10).join(all_explanations)}
 
-EXAMPLES FROM ALL CONCEPTS:
+EXAMPLES:
 {', '.join(all_examples[:10]) if all_examples else 'None'}
 
-TASK: Create a comprehensive response that:
-1. Acknowledges that the query relates to multiple interconnected concepts
-2. Synthesizes the information into a coherent, logical flow
-3. Shows how the concepts relate to each other
-4. Uses ONLY the information provided (don't add new facts)
-5. Incorporates relevant examples naturally
-6. Organizes with clear sections/headings if needed
-7. Is conversational and student-friendly
-8. Stays within O/L syllabus scope
+**YOUR TASK:**
 
-IMPORTANT: Don't just list the concepts separately - INTEGRATE them into a unified explanation that shows their relationships and provides a complete understanding.
+1. **Answer the SPECIFIC question** - Don't provide a general overview. Focus on what the student actually asked.
 
-Keep it well-structured but concise (4-6 paragraphs or use sections)."""
+2. **Prioritize by relevance** - Start with the most relevant concept that directly answers their question. Mention related concepts only if they help explain the answer.
+
+3. **Use ONLY expert system information** - Do NOT add external facts, concepts, or examples not provided above.
+
+4. **Show connections** - If multiple concepts are needed to answer, explain how they relate, but keep it focused on answering the question.
+
+5. **Progressive guidance with ONE SPECIFIC actionable question** - After answering, ask exactly 1 follow-up question that:
+   - Is SPECIFIC and ACTIONABLE (e.g., "Shall I explain mechanical digestion next?" not "What interests you?")
+   - Offers to explain a specific sub-topic or related concept from the expert system output
+   - Guides them to the next logical learning step
+   - Uses phrases like "Shall I...", "Would you like me to...", "Let me know if you'd like..."
+   - References a specific topic/concept from the expert system output
+   - Can be answered with a simple "yes" or short response
+
+6. **Format:**
+   - Start with most relevant information (2-3 paragraphs)
+   - Include 1-2 relevant examples from expert system
+   - Show concept connections if needed for the answer
+   - Add brief reasoning (1 sentence explaining why these concepts were selected)
+   - End with EXACTLY 1 SPECIFIC actionable question (prefix with "💭 ")
+
+**CRITICAL CONSTRAINTS:**
+- Use ONLY the information from expert system output above
+- Do NOT introduce new concepts beyond what's provided
+- Target the specific question, not a comprehensive lesson
+- Keep focused and concise (under 500 words)
+- Don't just list concepts - integrate them to answer the question
+- Follow-up questions MUST be specific offers to explain particular topics
+
+**Example Format:**
+[Direct answer to the specific question using most relevant concept]
+
+[Supporting explanation using related concepts if needed]
+
+[1-2 relevant examples from expert system]
+
+🔍 **Why this answer?** The expert system identified {len(responses)} related concepts because [brief reasoning about why these concepts match the query].
+
+💭 Shall I explain [specific sub-topic 1 from concepts] in more detail?"""
 
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are an O/L tutor skilled at synthesizing complex information into clear, integrated explanations."},
+                    {
+                        "role": "system", 
+                        "content": "You are an O/L tutor. CRITICAL: Use ONLY expert system information. Never add external knowledge. Answer the specific question asked - prioritize relevance over comprehensiveness. Guide students with EXACTLY 1 SPECIFIC actionable follow-up question (e.g., 'Shall I explain X next?' not 'What interests you?'). The question should be answerable with a simple 'yes'. Always include brief reasoning about why the expert system selected these concepts."
+                    },
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7,
-                max_tokens=1200
+                temperature=0.4,  # Lower for more focused responses
+                max_tokens=650  # Slightly increased to accommodate reasoning
             )
             synthesized = response.choices[0].message.content.strip()
             
             # Add metadata
             topic_str = ', '.join(topics) if topics else tool_used.replace('_', ' ').title()
-            match_count = f"\n\n---\n*Source: {topic_str} Expert System ({len(responses)} related concepts)*"
+            match_count = f"\n\n---\n*📚 Source: {topic_str} Expert System ({len(responses)} related concepts)*"
             
             return f"{synthesized}{match_count}"
             
@@ -531,6 +581,54 @@ Keep it well-structured but concise (4-6 paragraphs or use sections)."""
                 explanation = resp.get('explanation', '')
                 result += f"**{i}. {concept}**\n{explanation}\n\n"
             return result
+    
+    def _is_confirmation(self, text: str) -> bool:
+        """
+        Check if the user's response is a confirmation (yes, okay, sure, etc.).
+        
+        Args:
+            text: User's response
+            
+        Returns:
+            True if it's a confirmation
+        """
+        text_lower = text.lower().strip()
+        confirmations = [
+            'yes', 'yeah', 'yep', 'sure', 'ok', 'okay', 'alright', 'fine', 
+            'please', 'go ahead', 'continue', 'proceed', 'tell me', 'explain'
+        ]
+        # Check for exact match or if text is very short and contains a confirmation word
+        return text_lower in confirmations or (len(text_lower) < 20 and any(conf in text_lower for conf in confirmations))
+    
+    def _extract_topic_from_response(self, response_text: str) -> str:
+        """
+        Extract the topic that was offered in the last response.
+        Looks for phrases like "Shall I explain [topic]..." or "Would you like me to... [topic]..."
+        
+        Args:
+            response_text: The last assistant response
+            
+        Returns:
+            Extracted topic name or None
+        """
+        import re
+        
+        # Pattern 1: "Shall I explain [topic]..."
+        match = re.search(r"Shall I explain (.+?) (?:in more detail|next)", response_text, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        
+        # Pattern 2: "Would you like me to... [topic]..."
+        match = re.search(r"Would you like me to (?:walk you through|explain) (.+?)\?", response_text, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        
+        # Pattern 3: "Let me know if you'd like... [topic]..."
+        match = re.search(r"Let me know if you'd like (?:to learn about|me to explain) (.+?)[.?]", response_text, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        
+        return None
     
     def process_query(self, user_query: str) -> Dict[str, Any]:
         """
@@ -548,6 +646,64 @@ Keep it well-structured but concise (4-6 paragraphs or use sections)."""
         print(f"{'='*60}")
         print(f"Query: {user_query}\n")
         
+        # Check if this is a confirmation response to a previous offer
+        if self._is_confirmation(user_query) and self.last_offered_topic and self.last_tool_used:
+            print(f"✅ Detected confirmation to explain: {self.last_offered_topic}")
+            print(f"   Using tool: {self.last_tool_used}\n")
+            
+            # Create a query for the offered topic
+            query_for_topic = self.last_offered_topic
+            tool_to_use = self.last_tool_used
+            
+            # Clear the last offered topic
+            self.last_offered_topic = None
+            self.last_tool_used = None
+            
+            # Execute the tool with the offered topic
+            print(f"🔧 Executing expert tool for confirmed topic...")
+            tool_result = self._execute_tool(tool_to_use, query_for_topic)
+            
+            if tool_result.get('success'):
+                response = tool_result.get('response')
+                all_responses = [response] if not isinstance(response, list) else response
+                
+                # Enhance the response
+                print("✨ Enhancing response...")
+                if len(all_responses) > 1:
+                    enhanced_response = self._synthesize_multiple_rules(
+                        all_responses, 
+                        f"Explain {query_for_topic}",
+                        tool_to_use,
+                        [query_for_topic]
+                    )
+                else:
+                    fake_result = {'success': True, 'response': all_responses[0]}
+                    enhanced_response = self._enhance_response(fake_result, f"Explain {query_for_topic}")
+                
+                print(f"   ✅ Response enhanced\n")
+                print(f"{'='*60}\n")
+                
+                # Extract and store new offered topic from the response
+                self.last_offered_topic = self._extract_topic_from_response(enhanced_response)
+                self.last_tool_used = tool_to_use if self.last_offered_topic else None
+                
+                result = {
+                    'response': enhanced_response,
+                    'tool_used': tool_to_use,
+                    'query_topics': [query_for_topic],
+                    'success': True,
+                    'needs_clarification': False,
+                    'raw_expert_response': all_responses,
+                    'analysis': {'tool_name': tool_to_use, 'topics': [query_for_topic], 'reasoning': 'User confirmed interest in previously offered topic'},
+                    'confidence_metrics': None
+                }
+                
+                self.conversation_history.append({'query': user_query, 'result': result})
+                return result
+            else:
+                print(f"   ⚠️ Could not find information about {query_for_topic}\n")
+                # Fall through to normal processing
+        
         # Step 1: Analyze query to determine tool and parameters
         print("📊 Step 1: Analyzing query...")
         analysis = self._analyze_query(user_query)
@@ -556,64 +712,9 @@ Keep it well-structured but concise (4-6 paragraphs or use sections)."""
         print(f"   Query Topics: {', '.join(topics)}")
         print(f"   Reasoning: {analysis['reasoning']}\n")
         
-        # SPECIAL HANDLING FOR STUDY GUIDE EXPERT
-        # Study guide expert maintains state across interactions (traditional expert system behavior)
-        if analysis['tool_name'] == 'study_guide_expert':
-            print("🔧 Step 2: Activating Study Guide (Diagnostic Mode)...")
-            expert = self.tools['study_guide_expert']
-            
-            # Only reset if NOT already in an active diagnostic session
-            # This allows the expert to maintain state like a traditional expert system
-            if expert.has_active_session():
-                print("   ♻️ Continuing existing diagnostic session...")
-            else:
-                print("   🔄 Starting new diagnostic session...")
-                expert.reset()
-            
-            expert.run()
-            
-            if expert.requires_clarification():
-                print("   ✅ Next question ready\n")
-                print(f"{'='*60}\n")
-                return {
-                    'response': expert.get_clarification_question(),
-                    'tool_used': 'study_guide_expert',
-                    'query_topics': ['study_guidance'],
-                    'success': True,
-                    'needs_clarification': True,
-                    'raw_expert_response': None,
-                    'analysis': analysis,
-                    'confidence_metrics': None
-                }
-            elif expert.is_diagnosis_complete():
-                print("   ✅ Diagnosis complete\n")
-                diagnosis = expert.get_response()
-                print(f"{'='*60}\n")
-                return {
-                    'response': diagnosis,
-                    'tool_used': 'study_guide_expert',
-                    'query_topics': ['study_guidance'],
-                    'success': True,
-                    'needs_clarification': False,
-                    'raw_expert_response': diagnosis,
-                    'analysis': analysis,
-                    'confidence_metrics': None
-                }
-            else:
-                print("   ⚠️ Unknown state\n")
-                print(f"{'='*60}\n")
-                return {
-                    'response': "Let me help you with your studies. What specific area are you struggling with?",
-                    'tool_used': 'study_guide_expert',
-                    'query_topics': ['study_guidance'],
-                    'success': False,
-                    'needs_clarification': False,
-                    'raw_expert_response': None,
-                    'analysis': analysis,
-                    'confidence_metrics': None
-                }
+        # NOTE: Study Guide is now in a separate tab and not handled by this agent
+        # Only Biology, Physics, and Chemistry experts are available here
         
-        # NORMAL HANDLING FOR INFORMATION EXPERTS (Biology, Physics, Chemistry)
         # Step 2: Execute expert system tool for EACH topic
         print(f"🔧 Step 2: Executing expert tool for {len(topics)} topic(s)...")
         all_responses = []
@@ -678,6 +779,13 @@ Keep it well-structured but concise (4-6 paragraphs or use sections)."""
             print()
         
         print(f"{'='*60}\n")
+        
+        # Extract and store the offered topic from the response for next interaction
+        self.last_offered_topic = self._extract_topic_from_response(enhanced_response)
+        self.last_tool_used = analysis['tool_name'] if self.last_offered_topic else None
+        
+        if self.last_offered_topic:
+            print(f"💡 Stored offered topic for next interaction: '{self.last_offered_topic}'\n")
         
         # Build final result
         result = {
@@ -745,4 +853,6 @@ Keep it well-structured but concise (4-6 paragraphs or use sections)."""
         for tool in self.tools.values():
             tool.reset()
         self.conversation_history = []
+        self.last_offered_topic = None
+        self.last_tool_used = None
         print("🔄 Expert Agent reset complete")

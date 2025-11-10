@@ -332,6 +332,155 @@ class StudyGuideExpert(KnowledgeEngine):
         self.inferred_facts.append("room_for_optimization")
         self.reasoning_trace.append(f"✓ Rule Fired: Balanced metrics → Good foundation, room for optimization")
     
+    # Rule 17: Excessive sleep (>10 hours) → Health concern or data error
+    @Rule(
+        AS.f << Fact(sleep_hours=MATCH.h & P(lambda x: x > 10)),
+        salience=22
+    )
+    def infer_excessive_sleep(self, h):
+        self.declare(Fact(condition="excessive_sleep_detected"))
+        self.inferred_facts.append("excessive_sleep_warning")
+        self.reasoning_trace.append(f"⚠️ Rule Fired: Excessive sleep ({h}h) → Possible health concern or data entry error. Normal range: 7-9h")
+        self.uncertainty_factors.append(("unusual_sleep_pattern", 0.05))
+    
+    # Rule 18: Severe sleep deprivation (1-2 hours) → Emergency crisis intervention
+    @Rule(
+        AS.f << Fact(sleep_hours=MATCH.h & P(lambda x: 1 <= x <= 2)),
+        salience=30  # Highest priority - critical health risk
+    )
+    def infer_severe_sleep_deprivation(self, h):
+        self.declare(Fact(condition="severe_sleep_deprivation"))
+        self.inferred_facts.append("critical_sleep_crisis")
+        self.reasoning_trace.append(f"🚨 CRITICAL Rule Fired: Severe sleep deprivation ({h}h) → Immediate health risk. Cognitive function severely impaired.")
+        self.uncertainty_factors.append(("critical_health_risk", 0.15))
+    
+    # Rule 19: Critical sleep deficit (3-4 hours) → Immediate recovery protocol
+    @Rule(
+        AS.f << Fact(sleep_hours=MATCH.h & P(lambda x: 3 <= x <= 4)),
+        salience=28
+    )
+    def infer_critical_sleep_deficit(self, h):
+        self.declare(Fact(condition="critical_sleep_deficit"))
+        self.inferred_facts.append("severe_sleep_debt")
+        self.reasoning_trace.append(f"🚨 Rule Fired: Critical sleep deficit ({h}h) → Immediate recovery needed. Performance degraded by 40-60%.")
+        self.uncertainty_factors.append(("severe_sleep_debt", 0.12))
+    
+    # Rule 20: Suboptimal sleep (5-6 hours) → Optimization strategies
+    @Rule(
+        AS.f << Fact(sleep_hours=MATCH.h & P(lambda x: 5 <= x <= 6)),
+        salience=20
+    )
+    def infer_suboptimal_sleep(self, h):
+        self.declare(Fact(condition="suboptimal_sleep"))
+        self.inferred_facts.append("sleep_optimization_needed")
+        self.reasoning_trace.append(f"⚠️ Rule Fired: Suboptimal sleep ({h}h) → Below recommended 7-9h. Performance degraded by 20-30%.")
+        self.uncertainty_factors.append(("sleep_deficit", 0.08))
+    
+    # Rule 21: Optimal sleep (7-9 hours) → Maintenance recommendations
+    @Rule(
+        AS.f << Fact(sleep_hours=MATCH.h & P(lambda x: 7 <= x <= 9)),
+        salience=15
+    )
+    def infer_optimal_sleep(self, h):
+        self.declare(Fact(condition="optimal_sleep"))
+        self.inferred_facts.append("sleep_quality_good")
+        self.reasoning_trace.append(f"✓ Rule Fired: Optimal sleep ({h}h) → Within healthy range. Focus on sleep quality maintenance.")
+    
+    # Rule 22: Minimal stress (1-2) → Peak performance optimization
+    @Rule(
+        AS.f << Fact(stress=MATCH.s & P(lambda x: 1 <= x <= 2)),
+        salience=18
+    )
+    def infer_minimal_stress(self, s):
+        self.declare(Fact(condition="minimal_stress"))
+        self.inferred_facts.append("peak_performance_state")
+        self.reasoning_trace.append(f"✓ Rule Fired: Minimal stress ({s}/10) → Excellent baseline. Focus on maximizing this advantage.")
+    
+    # Rule 23: Low stress (3-4) → Proactive stress management
+    @Rule(
+        AS.f << Fact(stress=MATCH.s & P(lambda x: 3 <= x <= 4)),
+        salience=16
+    )
+    def infer_low_stress(self, s):
+        self.declare(Fact(condition="low_stress"))
+        self.inferred_facts.append("proactive_management_zone")
+        self.reasoning_trace.append(f"✓ Rule Fired: Low stress ({s}/10) → Good baseline. Proactive management can prevent escalation.")
+    
+    # Rule 24: Moderate-high stress (6-7) → Active intervention needed
+    @Rule(
+        AS.f << Fact(stress=MATCH.s & P(lambda x: 6 <= x <= 7)),
+        salience=22
+    )
+    def infer_moderate_high_stress(self, s):
+        self.declare(Fact(condition="moderate_high_stress"))
+        self.inferred_facts.append("intervention_needed")
+        self.reasoning_trace.append(f"⚠️ Rule Fired: Moderate-high stress ({s}/10) → Active intervention needed to prevent burnout.")
+        self.uncertainty_factors.append(("elevated_stress", 0.08))
+    
+    # Rule 25: Extreme stress (9-10) → Crisis mode + mental health resources
+    @Rule(
+        AS.f << Fact(stress=MATCH.s & P(lambda x: 9 <= x <= 10)),
+        salience=29
+    )
+    def infer_extreme_stress(self, s):
+        self.declare(Fact(condition="extreme_stress"))
+        self.inferred_facts.append("mental_health_crisis")
+        self.reasoning_trace.append(f"🚨 CRITICAL Rule Fired: Extreme stress ({s}/10) → Crisis level. Professional mental health support recommended.")
+        self.uncertainty_factors.append(("crisis_stress", 0.15))
+    
+    # Rule 26: Minimal study (0-1 hours) → Motivation + time management crisis
+    @Rule(
+        AS.f << Fact(study_hours=MATCH.h & P(lambda x: 0 <= x <= 1)),
+        salience=24
+    )
+    def infer_minimal_study(self, h):
+        self.declare(Fact(condition="minimal_study"))
+        self.inferred_facts.append("motivation_crisis")
+        self.reasoning_trace.append(f"⚠️ Rule Fired: Minimal study ({h}h) → Possible motivation or time management issue. Academic risk.")
+        self.uncertainty_factors.append(("academic_engagement_low", 0.10))
+    
+    # Rule 27: Low study (2-3 hours) → Efficiency and technique focus
+    @Rule(
+        AS.f << Fact(study_hours=MATCH.h & P(lambda x: 2 <= x <= 3)),
+        salience=18
+    )
+    def infer_low_study(self, h):
+        self.declare(Fact(condition="low_study"))
+        self.inferred_facts.append("efficiency_focus_needed")
+        self.reasoning_trace.append(f"⚠️ Rule Fired: Low study ({h}h) → Focus on study efficiency and effective techniques to maximize limited time.")
+    
+    # Rule 28: Optimal study (4-6 hours) → Quality over quantity emphasis
+    @Rule(
+        AS.f << Fact(study_hours=MATCH.h & P(lambda x: 4 <= x <= 6)),
+        salience=15
+    )
+    def infer_optimal_study(self, h):
+        self.declare(Fact(condition="optimal_study"))
+        self.inferred_facts.append("sustainable_study_pattern")
+        self.reasoning_trace.append(f"✓ Rule Fired: Optimal study ({h}h) → Sustainable range. Focus on quality and active learning techniques.")
+    
+    # Rule 29: Excessive study (9-10 hours) → Diminishing returns warning
+    @Rule(
+        AS.f << Fact(study_hours=MATCH.h & P(lambda x: 9 <= x <= 10)),
+        salience=21
+    )
+    def infer_excessive_study(self, h):
+        self.declare(Fact(condition="excessive_study"))
+        self.inferred_facts.append("diminishing_returns")
+        self.reasoning_trace.append(f"⚠️ Rule Fired: Excessive study ({h}h) → Diminishing returns zone. Risk of burnout and reduced effectiveness.")
+        self.uncertainty_factors.append(("overwork_risk", 0.08))
+    
+    # Rule 30: Extreme study (11-12 hours) → Burnout prevention mandate
+    @Rule(
+        AS.f << Fact(study_hours=MATCH.h & P(lambda x: 11 <= x <= 12)),
+        salience=26
+    )
+    def infer_extreme_study(self, h):
+        self.declare(Fact(condition="extreme_study"))
+        self.inferred_facts.append("burnout_imminent")
+        self.reasoning_trace.append(f"🚨 Rule Fired: Extreme study ({h}h) → Burnout risk critical. Immediate schedule reduction needed.")
+        self.uncertainty_factors.append(("critical_burnout_risk", 0.12))
+    
     @Rule(AS.f << Fact(condition="high_stress"), salience=10)
     def infer_low_focus(self, f):
         self.declare(Fact(condition="low_focus"))
@@ -469,13 +618,95 @@ class StudyGuideExpert(KnowledgeEngine):
             recs.append("**Stress Reduction**: Moderate stress detected. Daily 20-min walk + 10-min meditation can significantly improve focus and retention.")
         
         # Sleep-specific interventions
-        if sleep_hrs and sleep_hrs < 6:
-            recs.append(f"**CRITICAL: Sleep Deprivation** - {sleep_hrs}h/night is severely impacting cognition. Memory consolidation drops 40% below 6 hours.")
-            recs.append("**Sleep Recovery Protocol**: Go to bed 1 hour earlier tonight. No screens 1h before bed. Cool room (18°C), complete darkness.")
+        if "critical_sleep_crisis" in self.inferred_facts:
+            # Severe sleep deprivation (1-2 hours) - Rule 18
+            recs.append(f"🚨 **EMERGENCY: SEVERE SLEEP DEPRIVATION** - {sleep_hrs}h is a critical health risk. Normal cognitive function is impossible at this level.")
+            recs.append("**IMMEDIATE ACTION REQUIRED**: 1) Cancel all non-essential activities today, 2) Take a 90-minute nap NOW if possible, 3) Go to bed at least 2 hours earlier tonight, 4) Seek medical attention if this is chronic.")
+            recs.append("**Health Warning**: Sleep deprivation at this level impairs judgment worse than alcohol intoxication. Academic performance will be near zero. Recovery must be your only priority.")
+            recs.append("**Crisis Resources**: Contact university health services immediately. This level indicates possible crisis situation requiring professional support.")
+        elif "severe_sleep_debt" in self.inferred_facts:
+            # Critical sleep deficit (3-4 hours) - Rule 19
+            recs.append(f"🚨 **CRITICAL SLEEP DEFICIT** - {sleep_hrs}h/night causes 40-60% performance degradation. You're operating in crisis mode.")
+            recs.append("**Recovery Protocol**: Tonight: Sleep 8+ hours (set hard bedtime). This week: Build back to 7h minimum. Cancel non-essential commitments.")
+            recs.append("**Performance Reality Check**: Your current study efforts are 50% less effective than they would be with proper sleep. Sleeping IS studying.")
             if category == "memory":
-                recs.append("**Sleep-Memory Connection**: 90% of learning consolidation happens during sleep. Prioritize 7-8 hours over extra study time.")
-        elif sleep_hrs and sleep_hrs < 7:
-            recs.append(f"**Sleep Optimization**: You're getting {sleep_hrs}h - aim for 7-8h. Each additional hour improves memory retention by ~15%.")
+                recs.append("**Memory Impact**: Memory consolidation requires REM sleep - you're getting almost none. Information studied now won't stick.")
+        elif "sleep_optimization_needed" in self.inferred_facts:
+            # Suboptimal sleep (5-6 hours) - Rule 20
+            recs.append(f"⚠️ **SUBOPTIMAL SLEEP** - {sleep_hrs}h reduces performance by 20-30%. Aiming for 7-8h will significantly boost results.")
+            recs.append("**Sleep Extension Plan**: Move bedtime 30 min earlier this week, then another 30 min next week. Use the 10-3-2-1-0 rule: No caffeine 10h before bed, no food 3h before, no work 2h before, no screens 1h before, 0 times hitting snooze.")
+            if category == "focus":
+                recs.append("**Focus Impact**: That afternoon brain fog you feel? It's directly from insufficient sleep. Add 1-2h sleep to regain sharp focus.")
+        elif "sleep_quality_good" in self.inferred_facts:
+            # Optimal sleep (7-9 hours) - Rule 21
+            recs.append(f"✓ **OPTIMAL SLEEP** - {sleep_hrs}h is excellent! Your cognitive performance is at maximum capacity.")
+            recs.append("**Maintain Excellence**: Keep consistent sleep/wake times (even weekends). Monitor sleep quality using apps like Sleep Cycle. Focus on REM and deep sleep optimization.")
+            if category == "memory":
+                recs.append("**Memory Advantage**: Your sleep is perfect for memory consolidation. Review important material before bed to maximize overnight processing.")
+        elif sleep_hrs and sleep_hrs > 10:
+            # Excessive sleep warning (Rule 17 triggered)
+            recs.append(f"⚠️ **UNUSUAL SLEEP PATTERN** - You reported {sleep_hrs}h/night, which exceeds the recommended 7-9 hours for adults.")
+            recs.append("**Health Check Needed**: Excessive sleep (>10h) can indicate: 1) Depression or mood disorders, 2) Sleep quality issues (waking frequently), 3) Medical conditions (thyroid, sleep apnea), or 4) Data entry error.")
+            recs.append("**Recommended Actions**: If this is accurate, consult university health services or your doctor. Quality of sleep matters more than quantity. Track your actual sleep vs. time in bed.")
+            recs.append("**If Data Error**: Please re-enter with actual sleep hours. Normal healthy range is 7-9 hours per night.")
+        
+        # Stress-specific interventions by level
+        if "mental_health_crisis" in self.inferred_facts:
+            # Extreme stress (9-10) - Rule 25
+            recs.append(f"🚨 **CRISIS-LEVEL STRESS** - {stress}/10 stress indicates severe distress. Your wellbeing is more important than any deadline.")
+            recs.append("**URGENT: Seek Support Immediately**: 1) University Counseling Center (same-day appointments), 2) Crisis hotline: 988 (USA) / 116 123 (UK), 3) Trusted friend/family member, 4) Academic advisor for deadline extensions.")
+            recs.append("**Emergency Stress Relief**: 4-7-8 breathing (Inhale 4s, Hold 7s, Exhale 8s) x 4 rounds. Cold water on face. Progressive muscle relaxation. These activate parasympathetic nervous system.")
+            recs.append("**Academic Pause Needed**: Consider requesting incomplete grade or medical withdrawal. Your mental health must come first.")
+        elif "intervention_needed" in self.inferred_facts:
+            # Moderate-high stress (6-7) - Rule 24
+            recs.append(f"⚠️ **ELEVATED STRESS** - {stress}/10 is approaching burnout territory. Active intervention needed now to prevent crisis.")
+            recs.append("**Intervention Plan**: 1) Daily 20-min walk outside (proven stress reducer), 2) Box breathing 3x daily (4s in, 4s hold, 4s out, 4s hold), 3) Reduce study hours by 25% to prevent escalation.")
+            recs.append("**Schedule Relief Activities**: Block calendar time for stress management - it's not optional. Consider yoga, exercise, hobbies, social connection.")
+            if category == "focus":
+                recs.append("**Focus Recovery**: High stress kills concentration. Take frequent breaks (Pomodoro). Meditate 10 min before study sessions.")
+        elif "proactive_management_zone" in self.inferred_facts:
+            # Low stress (3-4) - Rule 23
+            recs.append(f"✓ **LOW STRESS** - {stress}/10 is a healthy baseline. Proactive management will keep you here.")
+            recs.append("**Maintain This State**: Daily stress check-ins. Keep stress diary to identify triggers. Continue current wellness practices.")
+            recs.append("**Stress Prevention**: Build buffer time in schedule. Practice saying 'no' to overcommitment. Weekly stress-relief activities.")
+        elif "peak_performance_state" in self.inferred_facts:
+            # Minimal stress (1-2) - Rule 22
+            recs.append(f"⭐ **PEAK MENTAL STATE** - {stress}/10 stress is optimal! You're in the zone for maximum learning and creativity.")
+            recs.append("**Maximize This Advantage**: Tackle your hardest, most complex material now. Your brain is primed for deep understanding and problem-solving.")
+            recs.append("**Maintain Peak Performance**: Track what's keeping stress low (sleep, exercise, social support). Replicate these conditions daily.")
+        
+        # Study hours interventions by level
+        if "burnout_imminent" in self.inferred_facts:
+            # Extreme study (11-12 hours) - Rule 30
+            recs.append(f"🚨 **BURNOUT IMMINENT** - {study_hrs}h/day is unsustainable and counterproductive. You're past the point of diminishing returns.")
+            recs.append("**MANDATORY REDUCTION**: Cut to 6h max tomorrow. Your brain needs recovery time to consolidate learning. More hours = less retention at this point.")
+            recs.append("**Quality Over Quantity**: 4 hours of focused, strategic study beats 12 hours of exhausted cramming. Prioritize sleep and breaks.")
+            recs.append("**Schedule Intervention**: Meet with academic advisor about workload. Consider dropping a course if possible. Your health matters more than grades.")
+        elif "diminishing_returns" in self.inferred_facts:
+            # Excessive study (9-10 hours) - Rule 29
+            recs.append(f"⚠️ **DIMINISHING RETURNS ZONE** - {study_hrs}h/day approaches the limit of productive study. Efficiency is dropping.")
+            recs.append("**Optimization Advice**: Research shows 6-8h is the sweet spot. Beyond that, fatigue reduces retention significantly. Consider reducing by 2-3 hours.")
+            recs.append("**Quality Focus**: Instead of longer hours, improve technique: Active recall testing, spaced repetition, teaching concepts to others.")
+        elif "sustainable_study_pattern" in self.inferred_facts:
+            # Optimal study (4-6 hours) - Rule 28
+            recs.append(f"✓ **OPTIMAL STUDY VOLUME** - {study_hrs}h/day is sustainable and effective. Focus on study quality now.")
+            recs.append("**Maximize Effectiveness**: Use proven techniques: Pomodoro (25 min work, 5 min break), active recall, elaborative interrogation, spaced repetition.")
+            recs.append("**Quality Indicators**: If you're staying in this range, focus on deep work vs. shallow work. Minimize distractions, use time-blocking.")
+        elif "efficiency_focus_needed" in self.inferred_facts:
+            # Low study (2-3 hours) - Rule 27
+            recs.append(f"⚠️ **LIMITED STUDY TIME** - {study_hrs}h/day may be insufficient depending on your goals. Focus on maximum efficiency.")
+            recs.append("**Efficiency Protocol**: Use Pareto principle (80/20 rule) - focus on high-yield material. Eliminate passive reading. Use active recall exclusively.")
+            recs.append("**Time Expansion**: If possible, find 1-2 more hours. Morning slots are most effective. Audit time-wasters (social media, TV).")
+            if category == "time_management":
+                recs.append("**Time Management**: Use time-blocking. Schedule study sessions like appointments. Track where time goes with app like RescueTime.")
+        elif "motivation_crisis" in self.inferred_facts:
+            # Minimal study (0-1 hours) - Rule 26
+            recs.append(f"🚨 **ACADEMIC ENGAGEMENT CRISIS** - {study_hrs}h/day indicates possible motivation or time management breakdown.")
+            recs.append("**Root Cause Analysis**: Is this: 1) Motivation issue (don't want to), 2) Time issue (don't have time), or 3) Mental health (can't focus)? Each needs different solution.")
+            recs.append("**Immediate Steps**: Start tiny - commit to just 15 minutes today. Use Pomodoro timer. Pick easiest/most interesting subject. Build momentum slowly.")
+            recs.append("**Support Resources**: Meet with academic advisor. Consider tutoring or study skills workshop. Join study group for accountability.")
+            if category == "motivation":
+                recs.append("**Motivation Recovery**: Set tiny, achievable goals. Use reward systems. Find study buddy. Connect material to personal interests.")
         
         # Learning style specific recommendations
         if learning:
@@ -522,14 +753,47 @@ class StudyGuideExpert(KnowledgeEngine):
         sleep_hrs = profile.get("sleep_hours")
         study_hrs = profile.get("study_hours")
         
-        if stress and stress >= 7:
-            parts.append(f"High stress detected ({stress}/10) - this significantly impacts {category}.")
-        if sleep_hrs and sleep_hrs < 6:
-            parts.append(f"Sleep deprivation ({sleep_hrs}h) is affecting cognitive performance.")
-        if study_hrs and study_hrs < 2:
-            parts.append(f"Very low study time ({study_hrs}h/day) - need to increase or optimize efficiency.")
-        elif study_hrs and study_hrs >= 8:
-            parts.append(f"High study hours ({study_hrs}h/day) - watch for diminishing returns and burnout.")
+        # Critical patterns (highest priority)
+        if "critical_sleep_crisis" in self.inferred_facts:
+            parts.append(f"🚨 EMERGENCY: Severe sleep deprivation ({sleep_hrs}h) - immediate health risk.")
+        elif "mental_health_crisis" in self.inferred_facts:
+            parts.append(f"🚨 CRISIS: Extreme stress ({stress}/10) - urgent professional support needed.")
+        elif "burnout_imminent" in self.inferred_facts:
+            parts.append(f"🚨 CRITICAL: Burnout imminent with {study_hrs}h/day study - immediate reduction required.")
+        
+        # Sleep patterns
+        elif "severe_sleep_debt" in self.inferred_facts:
+            parts.append(f"Critical sleep deficit ({sleep_hrs}h) causing 40-60% performance loss.")
+        elif "sleep_optimization_needed" in self.inferred_facts:
+            parts.append(f"Suboptimal sleep ({sleep_hrs}h) reducing {category} performance by 20-30%.")
+        elif "sleep_quality_good" in self.inferred_facts:
+            parts.append(f"Optimal sleep ({sleep_hrs}h) supporting peak cognitive function.")
+        elif sleep_hrs and sleep_hrs > 10:
+            parts.append(f"Unusual sleep pattern ({sleep_hrs}h) - health check recommended.")
+        
+        # Stress patterns
+        if "intervention_needed" in self.inferred_facts:
+            parts.append(f"Elevated stress ({stress}/10) approaching burnout zone - active intervention needed.")
+        elif "proactive_management_zone" in self.inferred_facts:
+            parts.append(f"Low-moderate stress ({stress}/10) - good baseline with room for prevention.")
+        elif "peak_performance_state" in self.inferred_facts:
+            parts.append(f"Minimal stress ({stress}/10) - optimal state for peak {category}.")
+        
+        # Study hours patterns
+        if "motivation_crisis" in self.inferred_facts:
+            parts.append(f"Minimal study engagement ({study_hrs}h/day) - motivation/time management concern.")
+        elif "efficiency_focus_needed" in self.inferred_facts:
+            parts.append(f"Limited study time ({study_hrs}h/day) - efficiency optimization critical.")
+        elif "sustainable_study_pattern" in self.inferred_facts:
+            parts.append(f"Optimal study volume ({study_hrs}h/day) - focus on quality techniques.")
+        elif "diminishing_returns" in self.inferred_facts:
+            parts.append(f"Excessive study ({study_hrs}h/day) entering diminishing returns zone.")
+        
+        # Compound patterns
+        if "critical_burnout_warning" in self.inferred_facts:
+            parts.append("CRITICAL BURNOUT: High stress + excessive study + insufficient sleep.")
+        elif "optimal_conditions_detected" in self.inferred_facts:
+            parts.append("OPTIMAL STATE: Balanced stress, good sleep, and adequate study creating peak conditions.")
         
         return " ".join(parts) if parts else f"Analyzing your {category} concerns..."
     
